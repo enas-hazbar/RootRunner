@@ -157,6 +157,7 @@ import Navbar from '@/components/Navbar.vue'
 import { ref, onMounted } from 'vue'
 import { db } from '@/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
+import Dashboard from './Dashboard.vue'
 
 // Browser-native hashing
 async function hashPassword(password) {
@@ -274,6 +275,9 @@ resetFields()
 closeAll()
 handleSuccessfulLogin(cleanUsername)
 showMessage(`👋 Welcome back, ${cleanUsername}!`)
+setTimeout(() => {
+  window.location.href = '/dashboard'
+}, 0)
 
     } else {
       alert('Incorrect password!')
