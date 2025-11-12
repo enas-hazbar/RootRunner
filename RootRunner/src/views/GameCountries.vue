@@ -1,9 +1,10 @@
 <template>
   <div class="game-page">
-    <GameTopBar 
-      @show-hint="showHint = true" 
-      @show-description="showDescription = true"
-    />
+<GameTopBar 
+  @show-hint="showHint = true" 
+  @show-challenge="showChallenge = true"
+/>
+
 
     <div class="game-container">
       <div class="ai-image">
@@ -13,9 +14,9 @@
       <div class="question-box">
         <h3>Countries — Ask the AI</h3>
         <p>
-          Type a country name and the AI will return its capital (press Enter).
-          The real challenge is hidden: find the file <code>text.txt</code> by
-          manipulating the URL — the second hint points you toward that.
+          Meet our AI — trained to recognize every capital city in the world
+          <!-- The real challenge is hidden: find the file <code>text.txt</code> by
+          manipulating the URL — the second hint points you toward that. -->
         </p>
 
         <div class="answer-box">
@@ -24,6 +25,7 @@
             placeholder="Enter a country (e.g. France) and press Enter..."
             v-model="country"
             @keyup.enter="getCapital"
+            class="game1"
           />
         </div>
 
@@ -36,25 +38,26 @@
     <!-- Hint Popup -->
     <div v-if="showHint" class="modal-overlay" @click.self="showHint = false">
       <div class="modal">
-        <h2>Hint 1</h2>
+                <i class="fa-solid fa-xmark close-icon" @click="showHint = false"></i>
+        <h2>Hints</h2>
         <p>
-          The file <code>text.txt</code> is hidden somewhere. Finding it is the first step.
+          Try to change something in the URL
         </p>
-        <button @click="showHint = false">Close</button>
+        <!-- <button @click="showHint = false" class="close">Close</button> -->
       </div>
     </div>
 
     <!-- Description / second hint popup -->
-    <div v-if="showDescription" class="modal-overlay" @click.self="showDescription = false">
+    <!-- <div v-if="showDescription" class="modal-overlay" @click.self="showDescription = false">
       <div class="modal">
+        <i class="fa-solid fa-xmark close-icon" @click="showDescription = false"></i>
         <h2>Hint 2 (URL hack)</h2>
         <p>
           The hidden file can be revealed by editing the browser URL. Try adding a path that ends with
           <code>text.txt</code> (for example: add <code>/../text.txt</code> or <code>/text.txt</code> to the end of the URL).
         </p>
-        <button @click="showDescription = false">Close</button>
       </div>
-    </div>
+    </div> -->
 
     <!-- Secret file reveal modal (shown when URL indicates secret) -->
     <div v-if="showSecret" class="modal-overlay">
@@ -64,6 +67,21 @@
         <p class="small-note">This will close automatically after 5 seconds.</p>
       </div>
     </div>
+<!-- Challenge Popup (Book Icon) -->
+<div v-if="showChallenge" class="modal-overlay" @click.self="showChallenge = false">
+  <div class="modal">
+        <i class="fa-solid fa-xmark close-icon" @click="showChallenge = false"></i>
+
+    <h2>Challenge Objective</h2>
+    <p>
+      Your goal is to go beyond what the AI shows you. While it can name any capital city in the world,
+      your real task lies in finding a hidden file called <code>text.txt</code>.
+      It’s concealed somewhere within this page. Use your problem-solving skills and
+      experiment with the URL to uncover it. Once discovered, the system will recognize your success.
+    </p>
+    <!-- <button @click="showChallenge = false">Close</button> -->
+  </div>
+</div>
 
     <!-- Congratulation modal (opens after secret modal auto-closes) -->
     <div v-if="showCongrats" class="modal-overlay" @click.self="closeCongrats">
@@ -104,6 +122,8 @@ const showHint = ref(false)
 const showDescription = ref(false)
 const showSecret = ref(false)
 const showCongrats = ref(false)
+const showChallenge = ref(false)
+
 
 // secret content (editable)
 const secretContent = ref(
@@ -181,7 +201,7 @@ async function onSecretFound() {
     }
     // open congrats modal
     showCongrats.value = true
-  }, 500) // 15000 ms = 15s
+  }, 800) // 15000 ms = 15s
 }
 
 /* stop timer if user navigates away */
@@ -232,9 +252,9 @@ function goToDashboard() {
 
 <style scoped>
 /* basic structure (keep similar theme to your other popups) */
-.game-page { background-color: #000; min-height: 100vh; color: white; font-family: "Poppins", sans-serif; }
+.game-page { background-color: #58a7d5; min-height: 100vh; color: white; font-family: "Poppins", sans-serif; }
 .game-container { display:flex; align-items:center; justify-content:center; min-height:80vh; gap:40px; padding-top:20px; }
-.ai-image img { height:300px; max-width:320px; }
+.ai-image img { height:745px; max-width:720px; }
 .question-box { background: rgba(255,255,255,0.06); padding:26px; border-radius:14px; width:560px; backdrop-filter: blur(4px); text-align:left; }
 .answer-box input { width:100%; padding:12px 14px; border-radius:8px; border:none; font-weight:600; color:#222; }
 .capital-display { margin-top:12px; background: rgba(0,0,0,0.35); padding:10px; border-radius:8px; }
@@ -265,6 +285,10 @@ function goToDashboard() {
   cursor:pointer;
   transition: .12s;
 }
+.answer-box input::placeholder,
+textarea::placeholder{
+  color: #fff;
+}
 .btn-back:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.45); }
 
 /* responsive */
@@ -272,4 +296,22 @@ function goToDashboard() {
   .ai-image { display:none; }
   .question-box { width:92%; }
 }
+.close-icon {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-icon:hover {
+  color: #0ef; /* your neon accent color */
+}
+
+.modal {
+  position: relative; /* ensures the close icon stays positioned inside the modal */
+}
+
 </style>

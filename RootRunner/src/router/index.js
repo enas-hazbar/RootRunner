@@ -39,7 +39,5 @@ const router = createRouter({
   
 });
 
-export default router; // 👈 this line is the fix
-
-
+export default router; 
 

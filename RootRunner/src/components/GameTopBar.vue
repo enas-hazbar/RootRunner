@@ -5,7 +5,7 @@
       <i class="fa-solid fa-lightbulb" title="Hint" @click="$emit('show-hint')"></i>
 
       <!-- Description -->
-      <i class="fa-solid fa-book" title="Description" @click="$emit('show-description')"></i>
+<i class="fa-solid fa-book" title="Challenge" @click="$emit('show-challenge')"></i>
 
       <!-- Exit -->
       <i class="fa-solid fa-right-from-bracket exit" title="Leave Game" @click="exitGame"></i>

@@ -9,15 +9,13 @@
     <section class="hero" id="home">
       <div class="hero-content">
         <h1>
-          ROOTRUNNER CYBERsecurity<br />
+          ROOTRUNNER CyberSecurity<br />
           Teaching Platform
         </h1>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin congue eu risus sollicitudin lobortis.
-          Nulla egestas dapibus sapien, sit amet facilisis nunc dignissim porttitor. Phasellus vulputate vel odio ac dictum.
-          Vestibulum imperdiet ex non quam suscipit molestie.
+         Think like a hacker. Learn like a pro. Play your way into cybersecurity.       
         </p>
-        <button class="btn-get-started" @click="showLogin = true">Get started</button>
+<button class="btn-get-started" @click="handleGetStarted">Get started</button>
       </div>
       <div class="hero-image">
         <img src="/home.png" alt="Cybersecurity Shield" />
@@ -67,12 +65,12 @@
         <div class="about-text">
           <h2>About</h2>
           <p>
-            RootRunner Technology is a platform dedicated to teaching cybersecurity in an interactive and engaging way.
-            We simplify complex topics like ethical hacking, data protection, and network security for learners at all levels.
+           RootRunner isn’t your typical learning platform — it’s a digital playground for cybersecurity enthusiasts.
+           Here, you don’t just study hacking, you experience it through interactive missions, logic puzzles, and hidden challenges.  
           </p>
           <p>
-            Our goal is to make cybersecurity education accessible to everyone through modern tools, visual learning, and
-            real-world examples.
+           Each level is designed to sharpen your skills, boost your curiosity, and teach you how to think like a real ethical hacker.
+
           </p>
         </div>
       </div>
@@ -81,10 +79,9 @@
     <!-- ===== WHO ARE WE SECTION ===== -->
     <section class="who-are-we" id="who">
       <div class="who-content">
-        <h2>Who are we?</h2>
+        <h2>Who am I</h2>
         <p>
-          We are a passionate team of developers and cybersecurity enthusiasts committed to helping others learn how to
-          protect the digital world.
+     RootRunner was built by one person with a passion for hacking, problem-solving, and teaching others how to think like a cybersecurity expert.
         </p>
 
         <div class="team-members">
@@ -105,13 +102,19 @@
         <div class="rules-text">
           <h2>The Rules</h2>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin congue eu risus sollicitudin lobortis.
-            Nulla egestas dapibus sapien, sit amet facilisis nunc dignissim porttitor. Phasellus vulputate vel odio ac dictum.
-            Vestibulum imperdiet ex non quam suscipit molestie. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          
+            Each mission comes with a limited number of hints — usually<strong>three</strong>,though easier challenges may have only <strong>two</strong>.<br /> 
+            You can access hints in two ways: <br /> 
+   <ul>
+<li><strong>Automatically:</strong>  A new hint appears every 3 minutes during gameplay.<br /></li>
+
+<li><strong>Manually: </strong>Click the lamp icon at the top of the game interface to reveal a hint instantly.</li>
+</ul>
+Hints remain visible throughout the mission.
+Once a hint is successfully completed, it will be marked as done, but stays on the screen so you can still review it.
+Remember, use your hints wisely. Every decision brings you closer to uncovering the truth hidden in the system.
           </p>
           <p>
-            Proin congue eu risus sollicitudin lobortis. Nulla egestas dapibus sapien, sit amet facilisis nunc dignissim
-            porttitor. Phasellus vulputate vel odio ac dictum. Vestibulum imperdiet ex non quam suscipit molestie.
           </p>
         </div>
       </div>
@@ -121,21 +124,23 @@
   <div class="contact-container">
     <h2>Contact Form</h2>
     <p>
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
-      vulputate vel odio ac dictum. Vestibulum imperdiet ex non quam suscipit
-      molestie.
+      Need help or found a bug in the system?  
+      Send us a message below. Our team reviews every report and suggestion to make RootRunner better for all players.
     </p>
 
-    <form class="contact-form">
+    <form class="contact-form" @submit.prevent="sendEmail">
       <div class="input-group">
-        <input type="text" placeholder="Your Name" required />
-        <input type="email" placeholder="Email Address" required />
+        <input type="text" placeholder="Your Name" v-model="name" required />
+        <input type="email" placeholder="Email Address" v-model="email" required />
       </div>
-      <textarea placeholder="Your Message" rows="6"></textarea>
+      <textarea placeholder="Your Message" rows="6" v-model="messageC" required></textarea>
       <button type="submit" class="send-btn">Send Message</button>
     </form>
+
+    <p v-if="statusMessage" class="status-message">{{ statusMessage }}</p>
   </div>
 </section>
+
 <section>
   <!-- Footer -->
   <footer class="footer">
@@ -158,6 +163,9 @@ import { ref, onMounted } from 'vue'
 import { db } from '@/firebase'
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import Dashboard from './Dashboard.vue'
+import emailjs from 'emailjs-com'
+import { useRouter } from 'vue-router'
+
 
 // Browser-native hashing
 async function hashPassword(password) {
@@ -169,9 +177,8 @@ async function hashPassword(password) {
 
 // TEAM
 const team = [
-  { name: 'John Doe', role: 'Cybersecurity Analyst', image: '/avater.png' },
-  { name: 'Jane Smith', role: 'Network Engineer', image: '/avater.png' },
-  { name: 'Alex Carter', role: 'Ethical Hacker', image: '/avater.png' }
+  { name: 'Enas', role: 'Student ', image: '/avater.png' },
+
 ]
 
 // STATES
@@ -184,6 +191,13 @@ const signupPassword = ref('')
 const confirmPassword = ref('')
 const message = ref('')
 const messageType = ref('') // "success" or "error"
+const name = ref('')
+const email = ref('')
+const messageC = ref('')
+const statusMessage = ref('')
+const router = useRouter()
+
+const isLoggedIn = ref(!!localStorage.getItem('loggedInUser'))
 
 function showMessage(text, type = 'success') {
   message.value = text
@@ -215,6 +229,14 @@ function resetFields() {
   signupUsername.value = ''
   signupPassword.value = ''
   confirmPassword.value = ''
+}
+
+function handleGetStarted() {
+  if (isLoggedIn.value) {
+    router.push('/dashboard')
+  } else {
+    showLogin.value = true
+  }
 }
 
 // SIGNUP
@@ -253,6 +275,33 @@ showMessage('✅ Account created successfully!')
     console.error('Signup error:', err)
     alert('Error creating account. Check console for details.')
   }
+}
+async function sendEmail() {
+  try {
+    const params = {
+      name: name.value,
+      email: email.value,
+      messageC: messageC.value,
+    }
+
+    await emailjs.send(
+      'service_nlym9r8',     // 🔹 Replace with your Service ID
+      'template_0g09xw8',    // 🔹 Replace with your Template ID
+      params,
+      'DAqq5Ou9VMEWEwZWE'      // 🔹 Replace with your Public Key
+    )
+
+    statusMessage.value = '✅ Message sent successfully!'
+    name.value = ''
+    email.value = ''
+    messageC.value = ''
+  } catch (error) {
+    console.error('EmailJS error:', error)
+    statusMessage.value = '❌ Failed to send message. Please try again later.'
+  }
+
+  // Clear status message after a few seconds
+  setTimeout(() => (statusMessage.value = ''), 4000)
 }
 
 // LOGIN

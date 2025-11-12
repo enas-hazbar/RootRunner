@@ -2,7 +2,7 @@
   <div class="dashboard">
     <NavbarDashboard />
 
-    <h1 class="page-title">Mini Cybersecurity Teaching Games</h1>
+    <h1 class="page-title">Mini Cybersecurity Teaching challenges</h1>
 
     <div class="game-container">
       <div v-for="(game, i) in games" :key="i" class="game-card">
@@ -28,10 +28,10 @@
           <img :src="selectedGame?.image" alt="Game Image" class="modal-img" />
           <p class="modal-description">
             <!-- description placeholder -->
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin congue eu risus sollicitudin lobortis.
-           Nulla egestas dapibus sapien, sit amet facilisis nunc dignissim porttitor. Phasellus vulputate vel
-            odio ac dictum. Vestibulum imperdiet ex non quam suscipit molestie. In et condimentum diam, et eleifend urna.
-             Pellentesque a lectus vel nunc consectetur dignissim. Nulla et quam vel ligula blandit ultrices.         
+          Welcome to your first mission.
+          Your task is simple — or so it seems.
+          Interact with the AI and answer the country-based questions, but stay alert. Somewhere on this page lies a hidden file named text.txt.
+          True hackers know where to look — sometimes the answer isn’t on the screen but in the URL itself.        
              </p>
         </div>
 
@@ -54,7 +54,7 @@ const username = ref(localStorage.getItem('loggedInUser'))
 // Games list
 const games = ref([
   {
-    title: 'Countries',
+    title: 'The Atlas Protocol',
     image: 'https://www.vedantu.com/seo/content-images/be90da47-30dc-492d-a50a-48a7f484d309.jpg',
     progress: 0
   },
@@ -83,7 +83,7 @@ async function loadProgress() {
     const countryProgress = data.progress?.Countries || 0
 
     // Update the Countries game inside the array
-    const game = games.value.find(g => g.title === 'Countries')
+    const game = games.value.find(g => g.title === 'The Atlas Protocol')
     if (game) game.progress = countryProgress
   }
 }
@@ -98,7 +98,7 @@ onMounted(async () => {
 
 function startGame(title) {
   showGamePopup.value = false
-  if (title === 'Countries') router.push('/GameCountries')
+  if (title === 'The Atlas Protocol') router.push('/GameCountries')
   // add more later...
 }
 </script>

@@ -12,40 +12,43 @@
       <a href="#contact" @click.prevent="scrollToSection('contact')" :class="{ active: activeSection === 'contact' }">Contact</a>
     </nav>
 
-<div class="user-icon" @click="toggleUserMenu">
-  <i class="fa-solid fa-circle-user"></i>
+    <!-- ✅ USER ICON + MENU -->
+    <div class="user-icon" @click="toggleUserMenu">
+      <i class="fa-solid fa-circle-user"></i>
 
-  <div v-if="showMenu" class="user-menu" @click.stop>
-    <template v-if="loggedInUser">
-      <p>👋 Welcome, <strong>{{ loggedInUser }}</strong></p>
-      <button class="logout-btn" @click="logout">Logout</button>
-    </template>
-    <template v-else>
-      <button class="login-btn" @click="openLogin">Login</button>
-    </template>
-  </div>
-</div>
-
+      <div v-if="showMenu" class="user-menu" @click.stop>
+        <template v-if="loggedInUser">
+          <p>👋 Welcome, <strong>{{ loggedInUser }}</strong></p>
+          <button @click="goToDashboard">Go to Dashboard</button>
+          <button class="logout-btn" @click="logout">Logout</button>
+        </template>
+        <template v-else>
+          <button class="login-btn" @click="openLogin">Login</button>
+        </template>
+      </div>
+    </div>
   </header>
+
+  <!-- ✅ MESSAGE BANNER -->
   <div v-if="message" :class="['message-banner', messageType]">
-  {{ message }}
-</div>
+    {{ message }}
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter } from 'vue-router'
 
-const activeSection = ref("home");
-const showMenu = ref(false);
+const router = useRouter()
 const loggedInUser = ref(localStorage.getItem("loggedInUser") || null);
+const showMenu = ref(false);
+const activeSection = ref("home");
 const message = ref('')
-const messageType = ref('') // "success" or "error"
+const messageType = ref('')
 
 function showMessage(text, type = 'success') {
   message.value = text
   messageType.value = type
-
-  // Hide message automatically after 3 seconds
   setTimeout(() => {
     message.value = ''
     messageType.value = ''
@@ -56,7 +59,7 @@ function toggleUserMenu() {
   showMenu.value = !showMenu.value;
 }
 
-// Scroll to section
+// Scroll highlight
 function scrollToSection(sectionId) {
   const element = document.getElementById(sectionId);
   if (element) {
@@ -65,7 +68,6 @@ function scrollToSection(sectionId) {
   }
 }
 
-// Track scroll for navbar highlighting
 function handleScroll() {
   const sections = ["home", "about", "who", "rules", "contact"];
   const scrollPos = window.scrollY + window.innerHeight / 2;
@@ -83,26 +85,31 @@ function handleScroll() {
   }
 }
 
-// ✅ Handle Login Button → triggers modal in Home.vue
+// ✅ Opens login modal (trigger handled in Home.vue)
 function openLogin() {
   const event = new CustomEvent("open-login-modal");
   window.dispatchEvent(event);
   showMenu.value = false;
 }
 
-// ✅ Handle Logout
+// ✅ Logout
 function logout() {
   localStorage.removeItem("loggedInUser");
   loggedInUser.value = null;
   showMenu.value = false;
-  showMessage('✅ Logged out successfully!')
+  router.push('/');
+  showMessage('✅ Logged out successfully!');
+}
 
+// ✅ Go to Dashboard
+function goToDashboard() {
+  showMenu.value = false;
+  router.push('/dashboard');
 }
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
-
-  // Listen for login events from Home.vue
+  // When a login event is fired
   window.addEventListener("user-logged-in", (e) => {
     loggedInUser.value = e.detail.username;
   });
@@ -111,5 +118,8 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
-
 </script>
+
+<style scoped>
+
+</style>
