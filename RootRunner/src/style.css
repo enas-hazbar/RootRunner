@@ -921,3 +921,85 @@ textarea:focus {
   font-weight: 600;
   text-align: center;
 }
+.leaderboard-box {
+  margin-top: 40px;
+  padding: 20px;
+  border-radius: 14px;
+  color: #d9faff;
+  background: rgba(0, 10, 20, 0.35);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 15px rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.leaderboard-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-shadow: 0 0 10px #00eaff;
+  letter-spacing: 1px;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.leaderboard-table th {
+  padding: 10px 0;
+  color: #79f2ff;
+  font-weight: 700;
+  text-shadow: 0 0 10px #00eaff;
+}
+
+.leaderboard-table td {
+  padding: 12px 0;
+  text-align: center;
+  color: #d6f7ff;
+}
+
+/* Rank glow colors */
+.rank-1 {
+  background: rgba(255, 215, 0, 0.12);
+  box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.rank-2 {
+  background: rgba(192, 192, 192, 0.12);
+  box-shadow: inset 0 0 15px rgba(192, 192, 192, 0.4);
+}
+
+.rank-3 {
+  background: rgba(205, 127, 50, 0.12);
+  box-shadow: inset 0 0 15px rgba(205, 127, 50, 0.4);
+}
+
+.rank-4,
+.rank-5 {
+  background: rgba(0, 255, 255, 0.06);
+}
+
+/* Hover animation */
+.leaderboard-row {
+  transition: 0.25s;
+}
+
+.leaderboard-row:hover {
+  transform: scale(1.02);
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+/* Icons column */
+.rank-icon {
+  font-size: 24px;
+}
+
+/* Empty state */
+.empty-text {
+  text-align: center;
+  opacity: 0.6;
+  font-size: 18px;
+  margin-top: 10px;
+}

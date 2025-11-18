@@ -29,15 +29,49 @@
           <p class="modal-description">
             <!-- description placeholder -->
           Welcome to your first mission.
-          Your task is simple — or so it seems.
+          Your task is simple... or so it seems.
           Interact with the AI and answer the country-based questions, but stay alert. Somewhere on this page lies a hidden file named text.txt.
-          True hackers know where to look — sometimes the answer isn’t on the screen but in the URL itself.        
+          True hackers know where to look, sometimes the answer isn’t on the screen but...?        
              </p>
         </div>
 
 <button class="start-btn" @click="startGame(selectedGame.title)">Start</button>
       </div>
     </div>
+<div class="leaderboard-box neon-panel">
+  <h2 class="leaderboard-title">⚡ Countries Challenge — Top 5 Hackers</h2>
+
+  <table v-if="leaderboard.length > 0" class="leaderboard-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>User</th>
+        <th>Time (sec)</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr
+        v-for="(entry, i) in leaderboard"
+        :key="i"
+        :class="['leaderboard-row', `rank-${i + 1}`]"
+      >
+        <td class="rank-icon">
+          <span v-if="i === 0">🥇</span>
+          <span v-else-if="i === 1">🥈</span>
+          <span v-else-if="i === 2">🥉</span>
+          <span v-else>⚡</span>
+        </td>
+
+        <td class="username-cell">{{ entry.username }}</td>
+        <td class="time-cell">{{ entry.time }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p v-else class="empty-text">No hackers here yet…</p>
+</div>
+
   </div>
 </template>
 
@@ -46,7 +80,12 @@ import NavbarDashboard from '@/components/NavbarDashboard.vue'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { db } from '@/firebase'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc,collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs } from 'firebase/firestore'
 
 const router = useRouter()
 const username = ref(localStorage.getItem('loggedInUser'))
@@ -63,10 +102,25 @@ const games = ref([
 
 const showGamePopup = ref(false)
 const selectedGame = ref(null)
+const leaderboard = ref([]);
+
 
 function openGamePopup(game) {
   selectedGame.value = game
   showGamePopup.value = true
+}
+async function loadLeaderboard() {
+  const q = query(
+    collection(db, "leaderboard"),
+    where("game", "==", "Countries"),
+    orderBy("time", "asc"),
+    limit(5)
+    
+  );
+
+  const snapshot = await getDocs(q);
+
+  leaderboard.value = snapshot.docs.map(doc => doc.data());
 }
 
 function closeGamePopup() {
@@ -93,7 +147,9 @@ onMounted(async () => {
     router.push('/')
   } else {
     await loadProgress()
+    await loadLeaderboard()
   }
+  
 })
 
 function startGame(title) {
@@ -105,5 +161,4 @@ function startGame(title) {
 
 
 <style scoped>
-
 </style>

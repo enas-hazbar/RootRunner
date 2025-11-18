@@ -1,17 +1,47 @@
 <template>
   <div class="game-topbar">
     <div class="icons">
+
       <!-- Hint -->
-      <i class="fa-solid fa-lightbulb" title="Hint" @click="$emit('show-hint')"></i>
+      <v-tooltip location="bottom">
+        <template #activator="{ props }">
+          <i
+            v-bind="props"
+            class="fa-solid fa-lightbulb"
+            @click="$emit('show-hint')"
+          ></i>
+        </template>
+        Hint
+      </v-tooltip>
 
       <!-- Description -->
-<i class="fa-solid fa-book" title="Challenge" @click="$emit('show-challenge')"></i>
+      <v-tooltip location="bottom">
+        <template #activator="{ props }">
+          <i
+            v-bind="props"
+            class="fa-solid fa-book"
+            @click="$emit('show-challenge')"
+          ></i>
+        </template>
+        Challenge
+      </v-tooltip>
 
       <!-- Exit -->
-      <i class="fa-solid fa-right-from-bracket exit" title="Leave Game" @click="exitGame"></i>
+      <v-tooltip location="bottom">
+        <template #activator="{ props }">
+          <i
+            v-bind="props"
+            class="fa-solid fa-right-from-bracket exit"
+            @click="exitGame"
+          ></i>
+        </template>
+        Leave Game
+      </v-tooltip>
+
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { useRouter } from 'vue-router'

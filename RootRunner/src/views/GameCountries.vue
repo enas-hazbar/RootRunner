@@ -14,7 +14,7 @@
       <div class="question-box">
         <h3>Countries — Ask the AI</h3>
         <p>
-          Meet our AI — trained to recognize every capital city in the world
+          Meet our AI, trained to recognize every capital city in the world
           <!-- The real challenge is hidden: find the file <code>text.txt</code> by
           manipulating the URL — the second hint points you toward that. -->
         </p>
@@ -22,7 +22,7 @@
         <div class="answer-box">
           <input
             type="text"
-            placeholder="Enter a country (e.g. France) and press Enter..."
+            placeholder="Enter a country..."
             v-model="country"
             @keyup.enter="getCapital"
             class="game1"
@@ -74,10 +74,7 @@
 
     <h2>Challenge Objective</h2>
     <p>
-      Your goal is to go beyond what the AI shows you. While it can name any capital city in the world,
-      your real task lies in finding a hidden file called <code>text.txt</code>.
-      It’s concealed somewhere within this page. Use your problem-solving skills and
-      experiment with the URL to uncover it. Once discovered, the system will recognize your success.
+      Your task lies in finding a hidden file called <strong>text.txt</strong>.
     </p>
     <!-- <button @click="showChallenge = false">Close</button> -->
   </div>
@@ -110,10 +107,24 @@ import GameTopBar from '@/components/GameTopBar.vue'
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { db } from '@/firebase'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs
+} from 'firebase/firestore'
 
 const router = useRouter()
 const route = useRoute()
+const gameStartTime = ref(null)
+const completionTime = ref(null)
 
 /* ---- UI state ---- */
 const country = ref('')
@@ -123,6 +134,10 @@ const showDescription = ref(false)
 const showSecret = ref(false)
 const showCongrats = ref(false)
 const showChallenge = ref(false)
+//const gameStartTime = ref(null)
+// const completionTime = ref(null)
+
+
 
 
 // secret content (editable)
@@ -172,36 +187,85 @@ function routeHasSecret(path) {
 }
 
 async function onSecretFound() {
-  // show the text file modal
-  showSecret.value = true
-  // ensure congrats hidden
-  showCongrats.value = false
+  console.log("🔥 SECRET FOUND TRIGGERED");
 
-  // clear any previous timer
-  if (secretTimer) {
-    clearTimeout(secretTimer)
-    secretTimer = null
-  }
+  const user = localStorage.getItem("loggedInUser");
+  console.log("🔥 username:", user);
 
-  // start 15s timer
+  // TIMER CALCULATION — always at least 1 second
+const now = Date.now();
+const diff = now - gameStartTime.value;
+completionTime.value = Math.round(diff / 1000);
+
+console.log("🔥 completionTime:", completionTime.value);
+
+
+  showSecret.value = true;
+  showCongrats.value = false;
+
+  if (secretTimer) clearTimeout(secretTimer);
+
+  // DELAY FOR SECRET POPUP
   secretTimer = setTimeout(async () => {
-    showSecret.value = false
-    // Mark challenge completed in Firestore (if user logged in)
-    if (username.value) {
+    showSecret.value = false;
+
+    // SAVE PROGRESS
+    if (user) {
       try {
-        const userRef = doc(db, 'users', username.value)
-        // set both a challenge flag and progress = 100 for this game
-        await setDoc(userRef, {
-          challenges: { Countries: true },
-          progress: { Countries: 100 }
-        }, { merge: true })
+        const userRef = doc(db, "users", user);
+        await setDoc(
+          userRef,
+          {
+            challenges: { Countries: true },
+            progress: { Countries: 100 }
+          },
+          { merge: true }
+        );
+        console.log("🔥 Progress saved for:", user);
       } catch (err) {
-        console.error('Failed to save completion:', err)
+        console.error("🔥 Progress save error:", err);
       }
     }
-    // open congrats modal
-    showCongrats.value = true
-  }, 800) // 15000 ms = 15s
+
+    // ⭐⭐⭐ SAVE BEST TIME ONLY ⭐⭐⭐
+
+    try {
+      // GET USER BEST TIME
+      const bestQuery = query(
+        collection(db, "leaderboard"),
+        where("username", "==", user),
+        where("game", "==", "Countries"),
+        orderBy("time", "asc"),
+        limit(1)
+      );
+
+      const bestSnap = await getDocs(bestQuery);
+      let bestTime = bestSnap.empty ? null : bestSnap.docs[0].data().time;
+
+      console.log("🔥 bestTime:", bestTime, "newTime:", completionTime.value);
+
+      // SAVE ONLY IF BEST OR FIRST TIME
+      if (bestTime === null || completionTime.value < bestTime) {
+        await addDoc(collection(db, "leaderboard"), {
+          username: user,
+          game: "Countries",
+          time: completionTime.value,
+          createdAt: serverTimestamp()
+        });
+
+        console.log("🔥 NEW BEST TIME SAVED:", completionTime.value);
+      } else {
+        console.log("⏸ Slower than best — NOT saving leaderboard");
+      }
+    } catch (err) {
+      console.error("🔥 leaderboard save error:", err);
+    }
+// After saving progress + leaderboard:
+localStorage.removeItem("atlas_start_time");
+showCongrats.value = true;
+
+  }, 800);
+
 }
 
 /* stop timer if user navigates away */
@@ -227,9 +291,25 @@ function checkCurrentLocation() {
 }
 
 onMounted(() => {
-  checkCurrentLocation()
-  window.addEventListener('popstate', checkCurrentLocation)
-})
+  // Check if timer already running
+  const savedStart = localStorage.getItem("atlas_start_time");
+
+  if (savedStart) {
+    // Continue the old timer
+    gameStartTime.value = parseInt(savedStart);
+    console.log("⏳ Timer resumed:", gameStartTime.value);
+  } else {
+    // Start a new timer
+    const now = Date.now();
+    localStorage.setItem("atlas_start_time", now);
+    gameStartTime.value = now;
+    console.log("🔥 Timer started:", now);
+  }
+
+  checkCurrentLocation();
+  window.addEventListener("popstate", checkCurrentLocation);
+});
+
 
 onUnmounted(() => {
   window.removeEventListener('popstate', checkCurrentLocation)
