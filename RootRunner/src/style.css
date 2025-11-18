@@ -885,19 +885,23 @@ textarea:focus {
 }
 
 .modal-img {
-  width: 180px;
-  height: 180px;
+  width: 200px;
+  height: 200px;
   border-radius: 10px;
   background: #ccc;
   object-fit: cover;
 }
-
 .modal-description {
-  flex: 1;
-  color: #ddd;
-  font-size: 14px;
-  line-height: 1.6;
+  text-align: left;        /* center the text */
+  margin: 0 auto;            /* center block */
+  width: 90%;                /* nice readable width */
+  line-height: 1.5;          /* better spacing */
+  font-size: 16px;           /* clean size */
+  color: #d6f7ff;            /* neon-cyber color */
+  margin-top: 20px;          /* spacing from image */
+  white-space: pre-line;     /* keep line breaks */
 }
+
 
 .start-btn {
   background: #0ef;
@@ -905,7 +909,7 @@ textarea:focus {
   border: none;
   padding: 10px 30px;
   border-radius: 25px;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s;

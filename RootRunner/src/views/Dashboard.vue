@@ -26,13 +26,8 @@
 
         <div class="modal-content">
           <img :src="selectedGame?.image" alt="Game Image" class="modal-img" />
-          <p class="modal-description">
-            <!-- description placeholder -->
-          Welcome to your first mission.
-          Your task is simple... or so it seems.
-          Interact with the AI and answer the country-based questions, but stay alert. Somewhere on this page lies a hidden file named text.txt.
-          True hackers know where to look, sometimes the answer isn’t on the screen but...?        
-             </p>
+  <p class="modal-description" v-html="selectedGame?.description"></p>
+
         </div>
 
 <button class="start-btn" @click="startGame(selectedGame.title)">Start</button>
@@ -95,9 +90,18 @@ const games = ref([
   {
     title: 'The Atlas Protocol',
     image: 'https://www.vedantu.com/seo/content-images/be90da47-30dc-492d-a50a-48a7f484d309.jpg',
-    progress: 0
+    progress: 0,
+       description: 
+       `Your task: uncover <strong>text.txt</strong>.
+       The file <strong><bold>text.txt</bold></strong> is hidden in this challenge.`
   },
-  // You can add more games later here...
+   {
+    title: 'Hacker Academy',
+    image: 'https://i.pinimg.com/1200x/f8/b5/0b/f8b50b208d1a02c5da9e408567f44f1a.jpg',
+    progress: 0,
+     description: 
+     `Your mission: retrieve the <strong>username</strong> and <strong>password</strong> hidden in this challenge.<br>`
+  }
 ])
 
 const showGamePopup = ref(false)
@@ -139,7 +143,11 @@ async function loadProgress() {
     // Update the Countries game inside the array
     const game = games.value.find(g => g.title === 'The Atlas Protocol')
     if (game) game.progress = countryProgress
+    const hackerProgress = data.progress?.HackerAcademy || 0
+const game2 = games.value.find(g => g.title === 'Hacker Academy')
+if (game2) game2.progress = hackerProgress
   }
+  
 }
 
 onMounted(async () => {
@@ -155,7 +163,9 @@ onMounted(async () => {
 function startGame(title) {
   showGamePopup.value = false
   if (title === 'The Atlas Protocol') router.push('/GameCountries')
-  // add more later...
+  if (title === 'Hacker Academy') {
+    router.push('/HackerAcademy')
+  }
 }
 </script>
 
