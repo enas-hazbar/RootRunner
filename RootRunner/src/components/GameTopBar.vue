@@ -2,13 +2,13 @@
   <div class="game-topbar">
     <div class="icons">
 
-      <!-- Hint -->
+      <!-- Hint button -->
       <v-tooltip location="bottom">
         <template #activator="{ props }">
           <i
             v-bind="props"
             class="fa-solid fa-lightbulb"
-            @click="$emit('show-hint')"
+            @click="handleHintClick"
           ></i>
         </template>
         Hint
@@ -42,16 +42,44 @@
   </div>
 </template>
 
-
 <script setup>
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
+
+// Props ONLY used for HackerAcademy
+const props = defineProps({
+  usedHint1: {
+    type: Boolean,
+    default: null
+  },
+  usedHint2: {
+    type: Boolean,
+    default: null
+  }
+})
+
+const emit = defineEmits(['show-hint', 'show-hint1', 'show-hint2'])
 
 function exitGame() {
   router.push('/dashboard')
 }
-</script>
 
+function handleHintClick() {
+  // If props are null → this is GameCountries → use the old event
+  if (props.usedHint1 === null) {
+    emit("show-hint")
+    return
+  }
+
+  // HackerAcademy logic
+  if (!props.usedHint1) {
+    emit("show-hint1")
+  } else if (!props.usedHint2) {
+    emit("show-hint2")
+  }
+}
+</script>
 <style scoped>
 .game-topbar {
   width: 100%;

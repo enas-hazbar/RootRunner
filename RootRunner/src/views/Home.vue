@@ -77,13 +77,13 @@
     </section>
 
     <!-- ===== WHO ARE WE SECTION ===== -->
-    <section class="who-are-we" id="who">
+    <!-- <section class="who-are-we" id="who">
       <div class="who-content">
         <h2>Who am I</h2>
         <p>
      RootRunner was built by one person with a passion for hacking, problem-solving, and teaching others how to think like a cybersecurity expert.
         </p>
-
+ 
         <div class="team-members">
           <div class="member" v-for="(member, i) in team" :key="i">
             <img :src="member.image" alt="Team member" />
@@ -92,7 +92,7 @@
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
     <!-- ===== RULES / INSTRUCTION ===== -->
     <section class="rules" id="rules">
       <div class="rules-container">

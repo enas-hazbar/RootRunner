@@ -503,7 +503,7 @@ textarea:focus {
   padding: 50px 60px;
   text-align: center;
   color: white;
-  width: 380px;
+  width: 490px;
   box-shadow: 0 0 30px rgba(0, 180, 255, 0.2);
   animation: slideIn 0.4s ease;
 }
@@ -589,27 +589,11 @@ textarea:focus {
   backdrop-filter: blur(5px);
 }
 
-.login-modal {
-  background: linear-gradient(180deg, #000000 0%, #1a2633 100%);
-  border-radius: 25px;
-  padding: 50px 60px;
-  text-align: center;
-  color: white;
-  width: 380px;
-  box-shadow: 0 0 25px rgba(0, 180, 255, 0.2);
-  animation: fadeIn 0.3s ease;
-}
-
 .login-logo {
   width: 90px;
   margin-bottom: 20px;
 }
 
-.login-modal h2 {
-  font-size: 1.5rem;
-  margin-bottom: 30px;
-  font-weight: 700;
-}
 
 .login-form {
   display: flex;
@@ -617,15 +601,6 @@ textarea:focus {
   gap: 20px;
 }
 
-.login-form input {
-  padding: 14px;
-  border: none;
-  border-radius: 6px;
-  background: #d9d9d9;
-  color: #111;
-  font-size: 1rem;
-  outline: none;
-}
 
 .save-btn, .back-btn {
   background: transparent;
@@ -1006,4 +981,165 @@ textarea:focus {
   opacity: 0.6;
   font-size: 18px;
   margin-top: 10px;
+}
+/* Full screen background */
+.academy-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #6c3a64, #120017);
+  padding-top: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+/* The big box */
+.main-box {
+  width: 75%;
+  max-width: 1100px;
+  max-height: 700px;
+  background: rgba(255, 255, 255, 0.197);
+  border-radius: 25px;
+  backdrop-filter: blur(8px);
+}
+
+/* Top Section */
+.top-section {
+  padding: 25px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255,255,255,0.12);
+  border-radius: 25px 25px 0 0;
+}
+
+.academy-logo {
+  width: 100px;
+  border-radius: 50%;
+}
+
+/* Navigation buttons */
+.nav-buttons span {
+  margin-left: 35px;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-buttons span.active {
+  font-weight: bold;
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/* Content area */
+.content-section {
+  padding: 50px 120px;
+  text-align: center;
+  color: white;
+}
+
+/* Home text */
+.home-content p {
+  line-height: 1.5;
+  /* text-align: left; */
+  margin-top: 70px;
+}
+
+/* LOGIN STYLE */
+.login-content {
+  width: 60%;
+  margin: auto;
+  text-align: left;
+  color: white;
+}
+
+.login-content h2 {
+  margin-bottom: 20px;
+}
+
+.login-content label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 6px;
+  font-size: 20px;
+}
+
+.login-content input {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: rgba(255,255,255,0.8);
+  border-radius: 4px;
+}
+
+.login-content button {
+  margin-top: 20px;
+  padding: 8px 25px;
+  background: black;
+  color: white;
+  border: none;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+}
+.game-page { background-color: #58a7d5; min-height: 100vh; color: white; font-family: "Poppins", sans-serif; }
+.game-container { display:flex; align-items:center; justify-content:center; min-height:80vh; gap:40px; padding-top:20px; }
+.ai-image img { height:745px; max-width:720px; }
+.question-box { background: rgba(255,255,255,0.06); padding:26px; border-radius:14px; width:560px; backdrop-filter: blur(4px); text-align:left; }
+.answer-box input { width:100%; padding:12px 14px; border-radius:8px; border:none; font-weight:600; color:#222; }
+.capital-display { margin-top:12px; background: rgba(0,0,0,0.35); padding:10px; border-radius:8px; }
+
+/* modal overlay (shared) */
+.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.75); display:flex; justify-content:center; align-items:center; z-index:3000; }
+.modal { background: linear-gradient(180deg, #0b0f12 0%, #1b2730 100%); color:#fff; border-radius:16px; padding:22px; width: min(720px, 92%); box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align:left; }
+.modal h2 { margin-top:0; }
+.modal pre.secret-text { background: rgba(255,255,255,0.02); padding:14px; border-radius:8px; color:#bfefff; white-space: pre-wrap; font-family: ui-monospace, Menlo, Monaco, "Roboto Mono", monospace; }
+.modal .small-note { margin-top:10px; color:#bfc7ca; font-size:13px; }
+
+/* congrats modal styling — colors matched to your theme (blue/teal theme) */
+.modal.congrats { text-align:center; background: linear-gradient(180deg, rgba(8,10,12,1) 0%, rgba(28,44,56,1) 100%); }
+.congrats-top { display:flex; gap:18px; align-items:center; justify-content:center; }
+.congrats-icon { font-size:40px; background: rgba(255,255,255,0.06); padding:12px; border-radius:8px; }
+.congrats h2 { color:#ffd36b; margin:10px 0 0; } /* accent color for header */
+.congrats-text { margin:18px 0; color:#e6f7fb; font-size:16px; line-height:1.4; }
+
+/* buttons */
+.congrats-buttons { display:flex; gap:12px; justify-content:center; margin-top:12px; }
+.btn-back {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255,255,255,0.25);
+  padding:12px 28px;
+  border-radius:28px;
+  font-weight:700;
+  cursor:pointer;
+  transition: .12s;
+}
+.answer-box input::placeholder,
+textarea::placeholder{
+  color: #fff;
+}
+.btn-back:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.45); }
+
+/* responsive */
+@media (max-width:720px) {
+  .ai-image { display:none; }
+  .question-box { width:92%; }
+}
+.close-icon {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  color: #aaa;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-icon:hover {
+  color: #0ef; /* your neon accent color */
+}
+
+.modal {
+  position: relative; /* ensures the close icon stays positioned inside the modal */
 }

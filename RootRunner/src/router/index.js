@@ -8,7 +8,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Dashboard from '@/views/Dashboard.vue';
 import GameCountries from '@/views/GameCountries.vue';
-import HackerAcademy from '@/components/HackerAcademy.vue';
+import HackerAcademy from '@/views/HackerAcademy.vue';
 
 const routes = [
       { path: '/', component: Home },
@@ -18,7 +18,14 @@ const routes = [
   path: '/text.txt',
   name: 'text-file',
   component: () => import('@/views/GameCountries.vue'),},
-  { path:'/HackerAcademy', component: HackerAcademy}
+  { path:'/HackerAcademy', component: HackerAcademy},
+  {
+  path: '/HackerAcademy/:pathMatch(.*)*',
+  name: 'HackerAcademyWild',
+  component: () => import('@/views/HackerAcademy.vue')
+}
+
+
 
 
 
