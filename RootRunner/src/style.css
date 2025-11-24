@@ -1143,3 +1143,16 @@ textarea::placeholder{
 .modal {
   position: relative; /* ensures the close icon stays positioned inside the modal */
 }
+.leaderboard-select {
+  background: #0a0f18;
+  color: #00eaff;
+  padding: 8px 14px;
+  font-size: 16px;
+  border: 1px solid #00eaff55;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+.leaderboard-select:hover {
+  border-color: #00eaff;
+}

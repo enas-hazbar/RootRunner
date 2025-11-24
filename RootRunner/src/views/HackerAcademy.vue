@@ -115,14 +115,24 @@
 
   </div>
 </template>
-
 <script setup>
-import { ref, watch } from "vue"
+import { ref, watch, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import GameTopBar from "@/components/GameTopBar.vue"
 import { db } from "@/firebase"
-import { doc, setDoc, getDoc} from "firebase/firestore"
-import { onMounted } from "vue"
+import {
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  getDocs,
+  serverTimestamp
+} from "firebase/firestore"
 
 const route = useRoute()
 
@@ -142,20 +152,21 @@ const username = ref("")
 const password = ref("")
 const correctUser = "vip"
 const correctPass = "pass123"
-const dataLoaded = ref(false)
-const showSuccess = ref(false);
-const hackerAcademyLeaderboard = ref([]);
+
+const showSuccess = ref(false)
+
+const gameStartTime = ref(null)     // timestamp (ms) when run started
+const completionTime = ref(0)      // final time in seconds
 
 function closeSuccess() {
-  showSuccess.value = false;
+  showSuccess.value = false
 }
 
 function goBack() {
-  window.location.href = "/Dashboard";   // ← change if your dashboard path is different
+  window.location.href = "/Dashboard"
 }
 
-
-/* OPEN/CLOSE HINT MENU */
+/* HINT POPUP */
 function openHints() {
   showHints.value = true
 }
@@ -168,46 +179,89 @@ function closeErrorPopup() {
   showErrorPopup.value = false
 }
 
+/* SAVE BEST TIME FOR HACKER ACADEMY */
+async function saveHackerAcademyScore() {
+  const user = localStorage.getItem("loggedInUser")
+  if (!user) return
+
+  // one doc per user per game: e.g. "hello01_HackerAcademy"
+  const scoreId = `${user}_HackerAcademy`
+  const scoreRef = doc(db, "leaderboard", scoreId)
+
+  try {
+    const snap = await getDoc(scoreRef)
+    const oldTime = snap.exists() ? snap.data().time : null
+
+    // save if first time or better than previous
+    if (oldTime === null || completionTime.value < oldTime) {
+      await setDoc(
+        scoreRef,
+        {
+          username: user,
+          game: "HackerAcademy",
+          time: completionTime.value,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      )
+
+      console.log(
+        "🔥 HackerAcademy best time saved/updated:",
+        completionTime.value
+      )
+    } else {
+      console.log(
+        "⏸ HackerAcademy time is slower, keeping old best:",
+        oldTime
+      )
+    }
+  } catch (err) {
+    console.error("🔥 Error saving HackerAcademy time:", err)
+  }
+}
+
+
 /* URL WATCHER (Step 1 + Step 2) */
 watch(
   () => route.fullPath,
   async (newPath) => {
-    console.log("URL changed:", newPath);
+    console.log("URL changed:", newPath)
 
-    const isHackerPage = newPath.startsWith("/HackerAcademy");
+    const isHackerPage = newPath.startsWith("/HackerAcademy")
 
-    // --- STEP 1: Invalid URL ---
-   if (
-  isHackerPage &&
-  !step1Error.value &&
-  newPath !== "/HackerAcademy" &&
-  !newPath.includes("admin.html")
-) {
-  console.log("STEP 1 TRIGGERED (invalid path)");
+    // STEP 1: invalid URL inside /HackerAcademy (but not admin.html)
+    if (
+      isHackerPage &&
+      !step1Error.value &&
+      newPath !== "/HackerAcademy" &&
+      !newPath.includes("admin.html")
+    ) {
+      console.log("STEP 1 TRIGGERED (invalid path)")
 
-  step1Error.value = true;
-  progress.value = Math.max(progress.value, 33);
+      step1Error.value = true
+      progress.value = progress.value < 33 ? 33 : progress.value
 
-  await saveProgress(progress.value);   // ✔ SAVE FIRST
+      await saveProgress(progress.value)
+      console.log("STEP 1 SAVED TO FIRESTORE:", step1Error.value)
 
-  console.log("STEP 1 SAVED TO FIRESTORE:", step1Error.value);
+      showErrorPopup.value = true
+    }
 
-  showErrorPopup.value = true;     // show popup fo
-}
-
-    // --- STEP 2: Admin.html ---
+    // STEP 2: admin.html
     if (isHackerPage && !step2Admin.value && newPath.includes("admin.html")) {
-      console.log("STEP 2 TRIGGERED (admin file found)");
+      console.log("STEP 2 TRIGGERED (admin file found)")
 
-      step2Admin.value = true;
-      progress.value = 66;
-      await saveProgress(66);
+      step2Admin.value = true
+      if (progress.value < 66) progress.value = 66
+      await saveProgress(progress.value)
 
-      showErrorPopup.value = true;     // popup for admin.html
+      showErrorPopup.value = true
     }
   },
   { immediate: true }
-);
+)
+
+/* ON MOUNT: load steps + START or RESUME TIMER (like Countries game) */
 onMounted(async () => {
   const user = localStorage.getItem("loggedInUser")
   if (!user) return
@@ -215,65 +269,84 @@ onMounted(async () => {
   const docRef = doc(db, "users", user)
   const snap = await getDoc(docRef)
 
-if (snap.exists()) {
-  const data = snap.data()
+  if (snap.exists()) {
+    const data = snap.data()
 
-  console.log("Loaded from Firestore:", data.progress)
-  console.log("Loaded steps:", data.progress?.HackerAcademySteps)
+    console.log("Loaded from Firestore:", data.progress)
+    console.log("Loaded steps:", data.progress && data.progress.HackerAcademySteps)
 
-  const steps = data.progress?.HackerAcademySteps
-  if (steps) {
-    step1Error.value = steps.step1Error || false
-    step2Admin.value = steps.step2Admin || false
-    step3Login.value = steps.step3Login || false
+    const steps = data.progress && data.progress.HackerAcademySteps
+    if (steps) {
+      step1Error.value = steps.step1Error || false
+      step2Admin.value = steps.step2Admin || false
+      step3Login.value = steps.step3Login || false
+    }
+
+    console.log("States after load:", {
+      step1Error: step1Error.value,
+      step2Admin: step2Admin.value,
+      step3Login: step3Login.value
+    })
+
+    progress.value = data.progress && data.progress.HackerAcademy
+      ? data.progress.HackerAcademy
+      : 0
   }
 
-  console.log("States after load:", {
-    step1Error: step1Error.value,
-    step2Admin: step2Admin.value,
-    step3Login: step3Login.value
-  })
+  // TIMER: same pattern as Countries (atlas_start_time) but with hacker_start_time
+  const savedStart = localStorage.getItem("hacker_start_time")
 
-  if (localStorage.getItem("showHackerCongrats") === "true") {
-    showCongratsPopup.value = true
+  if (savedStart) {
+    gameStartTime.value = parseInt(savedStart, 10)
+    if (isNaN(gameStartTime.value)) {
+      const now = Date.now()
+      gameStartTime.value = now
+      localStorage.setItem("hacker_start_time", now)
+    }
+    console.log("⏳ Hacker timer resumed at:", gameStartTime.value)
+  } else {
+    const now = Date.now()
+    gameStartTime.value = now
+    localStorage.setItem("hacker_start_time", now)
+    console.log("🔥 Hacker timer started at:", now)
   }
-
-}
-
 })
 
-/* VALIDATION */
-function isInvalidPath(path) {
-  if (!path.startsWith("/HackerAcademy")) return false
-  if (path === "/HackerAcademy") return false
-  if (path.includes("admin.html")) return false
-  return true
-}
-
-/* STEP 3 — LOGIN */
+/* STEP 3 — LOGIN (STOP TIMER + SAVE BEST TIME) */
 async function handleLogin() {
   if (username.value === correctUser && password.value === correctPass) {
-  // alert("VIP Access Granted!");
-  step3Login.value = true;
-  progress.value = 100;
+    const now = Date.now()
+    const startRaw = localStorage.getItem("hacker_start_time")
+    const start = startRaw ? parseInt(startRaw, 10) : now
 
-  localStorage.setItem("showHackerCongrats", "true")
+    let diff = now - start
+    if (diff < 1000) diff = 1000 // at least 1 second
 
-  await saveProgress(100);
+    completionTime.value = Math.round(diff / 1000)
+    console.log("⏱ Hacker Academy time:", completionTime.value)
 
-  showSuccess.value = true;   // ← SHOW POPUP
-}
- else {
+    step3Login.value = true
+    progress.value = 100
+    localStorage.setItem("showHackerCongrats", "true")
+
+    await saveProgress(progress.value)
+    await saveHackerAcademyScore()
+
+    // remove timer key so a new run will start fresh
+    localStorage.removeItem("hacker_start_time")
+
+    showSuccess.value = true
+  } else {
     alert("Wrong credentials.")
   }
 }
 
-/* SAVE TO FIREBASE */
+/* SAVE PROGRESS (steps & overall %) */
 async function saveProgress(val) {
   const user = localStorage.getItem("loggedInUser")
   if (!user) return
 
-  console.log("Saving progress:", val)
+  console.log("Saving HackerAcademy progress:", val)
 
   const userRef = doc(db, "users", user)
 
@@ -292,8 +365,8 @@ async function saveProgress(val) {
     { merge: true }
   )
 }
-
 </script>
+
 
 <style >
 /* SAME STYLE AS YOUR GAMECOUNTRIES POPUPS */

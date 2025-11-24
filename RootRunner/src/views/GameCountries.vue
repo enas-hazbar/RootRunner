@@ -230,39 +230,40 @@ console.log("🔥 completionTime:", completionTime.value);
     // ⭐⭐⭐ SAVE BEST TIME ONLY ⭐⭐⭐
 
     try {
-      // GET USER BEST TIME
-      const bestQuery = query(
-        collection(db, "leaderboard"),
-        where("username", "==", user),
-        where("game", "==", "Countries"),
-        orderBy("time", "asc"),
-        limit(1)
-      );
+      // create a unique doc ID for this user's Countries game
+      const scoreId = `${user}_Countries`;
+      const scoreRef = doc(db, "leaderboard", scoreId);
 
-      const bestSnap = await getDocs(bestQuery);
-      let bestTime = bestSnap.empty ? null : bestSnap.docs[0].data().time;
+      // check existing best time (if any)
+      const existing = await getDoc(scoreRef);
+      const oldTime = existing.exists() ? existing.data().time : null;
 
-      console.log("🔥 bestTime:", bestTime, "newTime:", completionTime.value);
+      console.log("🔥 Old best:", oldTime, "| New time:", completionTime.value);
 
-      // SAVE ONLY IF BEST OR FIRST TIME
-      if (bestTime === null || completionTime.value < bestTime) {
-        await addDoc(collection(db, "leaderboard"), {
-          username: user,
-          game: "Countries",
-          time: completionTime.value,
-          createdAt: serverTimestamp()
-        });
+      // save only if first time or faster
+      if (oldTime === null || completionTime.value < oldTime) {
+        await setDoc(
+          scoreRef,
+          {
+            username: user,
+            game: "Countries",
+            time: completionTime.value,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
 
-        console.log("🔥 NEW BEST TIME SAVED:", completionTime.value);
+        console.log("🔥 Countries BEST TIME UPDATED:", completionTime.value);
       } else {
-        console.log("⏸ Slower than best — NOT saving leaderboard");
+        console.log("⏸ Slower, NOT updating leaderboard");
       }
     } catch (err) {
       console.error("🔥 leaderboard save error:", err);
     }
-// After saving progress + leaderboard:
-localStorage.removeItem("atlas_start_time");
-showCongrats.value = true;
+
+    // After saving progress + leaderboard:
+    localStorage.removeItem("atlas_start_time");
+    showCongrats.value = true;
 
   }, 800);
 

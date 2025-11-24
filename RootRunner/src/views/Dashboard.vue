@@ -34,22 +34,23 @@
       </div>
     </div>
 <div class="leaderboard-box neon-panel">
-  <h2 class="leaderboard-title">⚡ Countries Challenge — Top 5 Hackers</h2>
+  <h2 class="leaderboard-title">🔥 Top 10 Hackers — All Games</h2>
 
-  <table v-if="leaderboard.length > 0" class="leaderboard-table">
+  <table v-if="combinedLeaderboard.length > 0" class="leaderboard-table">
     <thead>
       <tr>
         <th>Rank</th>
         <th>User</th>
+        <th>Game</th>
         <th>Time (sec)</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr
-        v-for="(entry, i) in leaderboard"
+      <tr 
+        v-for="(entry, i) in combinedLeaderboard" 
         :key="i"
-        :class="['leaderboard-row', `rank-${i + 1}`]"
+        :class="['leaderboard-row', `rank-${i+1}`]"
       >
         <td class="rank-icon">
           <span v-if="i === 0">🥇</span>
@@ -58,13 +59,14 @@
           <span v-else>⚡</span>
         </td>
 
-        <td class="username-cell">{{ entry.username }}</td>
-        <td class="time-cell">{{ entry.time }}</td>
+        <td>{{ entry.username }}</td>
+        <td>{{ entry.game }}</td>
+        <td>{{ entry.time }}</td>
       </tr>
     </tbody>
   </table>
 
-  <p v-else class="empty-text">No hackers here yet…</p>
+  <p v-else class="empty-text">No hackers yet…</p>
 </div>
 
   </div>
@@ -107,6 +109,19 @@ const games = ref([
 const showGamePopup = ref(false)
 const selectedGame = ref(null)
 const leaderboard = ref([]);
+const combinedLeaderboard = ref([]);
+
+async function loadUnifiedLeaderboard() {
+  const q = query(
+    collection(db, "leaderboard"),
+    orderBy("time", "asc"),
+    limit(10)
+  );
+
+  const snapshot = await getDocs(q);
+
+  combinedLeaderboard.value = snapshot.docs.map(doc => doc.data());
+}
 
 
 function openGamePopup(game) {
@@ -116,10 +131,9 @@ function openGamePopup(game) {
 async function loadLeaderboard() {
   const q = query(
     collection(db, "leaderboard"),
-    where("game", "==", "Countries"),
+    where("game", "==", selectedGame.value),
     orderBy("time", "asc"),
     limit(5)
-    
   );
 
   const snapshot = await getDocs(q);
@@ -156,7 +170,9 @@ onMounted(async () => {
   } else {
     await loadProgress()
     await loadLeaderboard()
+    await loadUnifiedLeaderboard();
   }
+
   
 })
 
