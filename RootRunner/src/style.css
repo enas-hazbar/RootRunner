@@ -119,6 +119,7 @@
   align-items: center;
   gap: 10px;
   position: relative;
+  margin-top: -40px;
   /* left: -80px; */
 }
 .logo h2 {
@@ -763,7 +764,8 @@ textarea:focus {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 25px;
+  gap:25px;
+  margin: -160px;
 }
 
 .game-card {

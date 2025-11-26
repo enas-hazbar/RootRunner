@@ -30,6 +30,13 @@
     <form class="login-form" @submit.prevent="handleLogin">
       <input type="text" v-model="loginUsername" placeholder="Username" required />
       <input type="password" v-model="loginPassword" placeholder="Password" required />
+      <p class="error" v-if="loginErrorUser">{{ loginErrorUser }}</p>
+<p class="error" v-if="loginErrorPass">{{ loginErrorPass }}</p>
+
+<p class="error" v-if="loginErrorBoth">
+  Incorrect username / password.
+</p>
+
       <button type="submit" class="save-btn">Login</button>
     </form>
     <button class="google-btn" @click="handleGoogleLogin">
@@ -53,6 +60,10 @@
       <input type="text" v-model="signupUsername" placeholder="Choose your username" required />
       <input type="password" v-model="signupPassword" placeholder="Choose your password" required />
       <input type="password" v-model="confirmPassword" placeholder="Confirm password" required />
+      <p class="error" v-if="signupError">{{ signupError }}</p>
+<p class="error" v-if="passwordStrengthError">{{ passwordStrengthError }}</p>
+<p class="error" v-if="passwordMatchError">{{ passwordMatchError }}</p>
+
       <div class="btn-row">
         <button type="submit" class="save-btn">Save</button>
         <button type="button" class="back-btn" @click="switchToLogin">Back to login</button>
@@ -204,6 +215,16 @@ const statusMessage = ref('')
 const router = useRouter()
 
 const isLoggedIn = ref(!!localStorage.getItem('loggedInUser'))
+// 🔐 Validation Errors (Signup)
+const signupError = ref("");
+const passwordStrengthError = ref("");
+const passwordMatchError = ref("");
+
+// 🔐 Validation Errors (Login)
+const loginErrorUser = ref("");
+const loginErrorPass = ref("");
+const loginErrorBoth = ref("");
+
 
 function showMessage(text, type = 'success') {
   message.value = text
@@ -215,6 +236,22 @@ function showMessage(text, type = 'success') {
     messageType.value = ''
   }, 3000)
 }
+function validatePasswordStrength(password) {
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const longEnough = password.length >= 8;
+
+  if (!longEnough || !hasUpper || !hasLower || !hasNumber) {
+    passwordStrengthError.value = 
+      "Password must contain 8 letters, one uppercase, one lowercase and a number.";
+    return false;
+  }
+
+  passwordStrengthError.value = "";
+  return true;
+}
+
 
 // FUNCTIONS
 function closeAll() {
@@ -247,41 +284,48 @@ function handleGetStarted() {
 
 // SIGNUP
 async function handleSignup() {
-  try {
-    if (!signupUsername.value || !signupPassword.value) {
-      alert('Please fill in all fields!')
-      return
-    }
+  signupError.value = "";
+  passwordStrengthError.value = "";
+  passwordMatchError.value = "";
 
-    if (signupPassword.value !== confirmPassword.value) {
-      alert('Passwords do not match!')
-      return
-    }
-
-    const cleanUsername = signupUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '')
-    const userRef = doc(db, 'users', cleanUsername)
-    const existing = await getDoc(userRef)
-    if (existing.exists()) {
-      alert('Username already taken!')
-      return
-    }
-
-    const hashed = await hashPassword(signupPassword.value)
-    await setDoc(userRef, {
-      username: cleanUsername,
-      password: hashed,
-      createdAt: new Date()
-    })
-resetFields()
-switchToLogin()
-showMessage('✅ Account created successfully!')
-
-
-  } catch (err) {
-    console.error('Signup error:', err)
-    alert('Error creating account. Check console for details.')
+  if (!signupUsername.value || !signupPassword.value || !confirmPassword.value) {
+    signupError.value = "Please fill in all fields.";
+    return;
   }
+
+  // Password strength
+  if (!validatePasswordStrength(signupPassword.value)) return;
+
+  // Password match
+  if (signupPassword.value !== confirmPassword.value) {
+    passwordMatchError.value = "Passwords don't match.";
+    return;
+  }
+
+  const cleanUsername = signupUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  const userRef = doc(db, "users", cleanUsername);
+  const existing = await getDoc(userRef);
+
+  if (existing.exists()) {
+    signupError.value = "⚠️ This username is already taken.";
+    return;
+  }
+
+  const hashed = await hashPassword(signupPassword.value);
+
+  await setDoc(userRef, {
+    username: cleanUsername,
+    password: hashed,
+    createdAt: new Date(),
+  });
+
+  // AUTO-LOGIN + redirect to dashboard
+  localStorage.setItem("loggedInUser", cleanUsername);
+
+  showSignup.value = false;
+  router.push("/dashboard");
 }
+
 async function sendEmail() {
   try {
     const params = {
@@ -312,35 +356,31 @@ async function sendEmail() {
 
 // LOGIN
 async function handleLogin() {
-  try {
-    const cleanUsername = loginUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '')
-    const userRef = doc(db, 'users', cleanUsername)
-    const userSnap = await getDoc(userRef)
+  loginErrorUser.value = "";
+  loginErrorPass.value = "";
+  loginErrorBoth.value = "";
 
-    if (!userSnap.exists()) {
-      alert('User not found!')
-      return
-    }
+  const cleanUsername = loginUsername.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  const userRef = doc(db, "users", cleanUsername);
+  const snap = await getDoc(userRef);
 
-    const data = userSnap.data()
-    const enteredHash = await hashPassword(loginPassword.value)
-
-    if (enteredHash === data.password) {
-resetFields()
-closeAll()
-handleSuccessfulLogin(cleanUsername)
-showMessage(`👋 Welcome back, ${cleanUsername}!`)
-setTimeout(() => {
-  window.location.href = '/dashboard'
-}, 0)
-
-    } else {
-      alert('Incorrect password!')
-    }
-  } catch (err) {
-    console.error('Login error:', err)
-    alert('Error logging in. Check console for details.')
+  if (!snap.exists()) {
+    loginErrorUser.value = "Username is not correct.";
+    return;
   }
+
+  const data = snap.data();
+  const enteredHash = await hashPassword(loginPassword.value);
+
+  if (enteredHash !== data.password) {
+    loginErrorPass.value = "Password is not correct.";
+    return;
+  }
+
+  // Successful login
+  localStorage.setItem("loggedInUser", cleanUsername);
+  showLogin.value = false;
+  router.push("/dashboard");
 }
 onMounted(() => {
   // When Navbar "Login" button is clicked
@@ -397,4 +437,11 @@ async function handleGoogleLogin() {
 </script>
 
 <style scoped>
+.error {
+  color: #b30000;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 </style>
