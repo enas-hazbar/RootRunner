@@ -1156,3 +1156,27 @@ textarea::placeholder{
 .leaderboard-select:hover {
   border-color: #00eaff;
 }
+.google-btn {
+  margin-top: 10px;
+  width: 100%;
+  background: white;
+  color: #444;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 20px;
+}
+
+.google-btn:hover {
+  background: #f1f1f1;
+}
+
+.google-icon {
+  width: 20px;
+}

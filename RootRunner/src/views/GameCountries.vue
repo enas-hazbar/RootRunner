@@ -73,9 +73,11 @@
         <i class="fa-solid fa-xmark close-icon" @click="showChallenge = false"></i>
 
     <h2>Challenge Objective</h2>
+    <br />
     <p>
       Your task lies in finding a hidden file called <strong>text.txt</strong>.
     </p>
+    <br />
     <!-- <button @click="showChallenge = false">Close</button> -->
   </div>
 </div>

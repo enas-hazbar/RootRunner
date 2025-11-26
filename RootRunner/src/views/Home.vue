@@ -32,6 +32,10 @@
       <input type="password" v-model="loginPassword" placeholder="Password" required />
       <button type="submit" class="save-btn">Login</button>
     </form>
+    <button class="google-btn" @click="handleGoogleLogin">
+      <img src="https://icon2.cleanpng.com/20240216/fty/transparent-google-logo-flat-google-logo-with-blue-green-red-1710875585155.webp" class="google-icon" />
+      Continue with Google
+    </button>
 
     <p class="register-text" @click="switchToSignup">
       I don’t have an account!
@@ -165,6 +169,8 @@ import { doc, getDoc, setDoc } from 'firebase/firestore'
 import Dashboard from './Dashboard.vue'
 import emailjs from 'emailjs-com'
 import { useRouter } from 'vue-router'
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+
 
 
 // Browser-native hashing
@@ -348,6 +354,44 @@ function handleSuccessfulLogin(username) {
   localStorage.setItem("loggedInUser", username)
   const event = new CustomEvent("user-logged-in", { detail: { username } })
   window.dispatchEvent(event)
+}
+async function handleGoogleLogin() {
+  try {
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const cleanUsername = user.email.split("@")[0].toLowerCase();
+
+    // Save user in Firestore if not exists
+    const userRef = doc(db, "users", cleanUsername);
+    const snap = await getDoc(userRef);
+
+    if (!snap.exists()) {
+      await setDoc(userRef, {
+        username: cleanUsername,
+        googleName: user.displayName,
+        googleEmail: user.email,
+        createdAt: new Date(),
+      });
+    }
+
+    // Save login session
+    localStorage.setItem("loggedInUser", cleanUsername);
+
+    showLogin.value = false;
+    showSignup.value = false;
+
+    showMessage(`👋 Logged in as ${cleanUsername} (Google)`);
+
+    router.push("/dashboard");
+
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    alert("Google login failed.");
+  }
 }
 
 </script>

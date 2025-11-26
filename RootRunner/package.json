@@ -13,11 +13,14 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.1.0",
+    "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "emailjs-com": "^3.2.0",
     "firebase": "^12.5.0",
     "vue": "^3.5.22",
+    "vue-google-oauth2": "^1.5.10",
     "vue-router": "^4.6.3",
+    "vue3-google-login": "^2.0.34",
     "vuetify": "^3.10.11"
   },
   "devDependencies": {

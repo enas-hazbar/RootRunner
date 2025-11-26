@@ -103,6 +103,13 @@ const games = ref([
     progress: 0,
      description: 
      `Your mission: retrieve the <strong>username</strong> and <strong>password</strong> hidden in this challenge.<br>`
+  },
+     {
+    title: 'City view',
+    image: 'https://images.photowall.com/products/66960/city-view-from-the-balcony.jpg?h=699&q=85',
+    progress: 0,
+     description: 
+     `Your mission: Find the hidden admin file somewhere in the system. Inside that file you’ll discover a link to our secret admin website. Log in to that admin site using the credentials you find, and finally upload a picture showing either a city view or a countryside view to complete the challenge`
   }
 ])
 
@@ -160,6 +167,10 @@ async function loadProgress() {
     const hackerProgress = data.progress?.HackerAcademy || 0
 const game2 = games.value.find(g => g.title === 'Hacker Academy')
 if (game2) game2.progress = hackerProgress
+  const cityViewProgress = data.progress?.CityView || 0
+    const game3 = games.value.find(g => g.title === 'City view')
+    if (game3) game3.progress = cityViewProgress
+
   }
   
 }
@@ -182,6 +193,7 @@ function startGame(title) {
   if (title === 'Hacker Academy') {
     router.push('/HackerAcademy')
   }
+    if (title === 'City view') router.push('/CityView')
 }
 </script>
 

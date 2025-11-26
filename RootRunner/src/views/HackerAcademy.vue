@@ -2,7 +2,9 @@
   <div class="academy-page">
     
     <!-- Top bar with hint button -->
-    <GameTopBar @show-hint="openHints" />
+    <GameTopBar @show-hint="openHints"
+    @show-challenge="showChallenge = true"
+    />
 
     <!-- Main Box -->
     <div class="academy-wrapper">
@@ -112,7 +114,19 @@
     <p class="success-hint">This popup stays until you close it.</p>
   </div>
 </div>
+<div v-if="showChallenge" class="modal-overlay" @click.self="showChallenge = false">
+  <div class="modal">
+        <i class="fa-solid fa-xmark close-icon" @click="showChallenge = false"></i>
 
+    <h2>Challenge Objective</h2>
+    <br />
+    <p>
+      Your mission: retrieve the <strong>username and password</strong> hidden in this challenge.
+    </p>
+    <br />
+    <!-- <button @click="showChallenge = false">Close</button> -->
+  </div>
+</div>
   </div>
 </template>
 <script setup>
@@ -140,7 +154,7 @@ const route = useRoute()
 const activeTab = ref("home")
 const showHints = ref(false)
 const showErrorPopup = ref(false)
-
+const showChallenge = ref(false)
 const step1Error = ref(false)
 const step2Admin = ref(false)
 const step3Login = ref(false)
