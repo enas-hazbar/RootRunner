@@ -6,7 +6,7 @@
 />
 
 
-    <div class="game-container">
+    <div class="game-container1">
       <div class="ai-image">
         <img src="/ai.png" alt="AI Brain" />
       </div>
@@ -336,7 +336,7 @@ function goToDashboard() {
 <style scoped>
 /* basic structure (keep similar theme to your other popups) */
 .game-page { background-color: #58a7d5; min-height: 100vh; color: white; font-family: "Poppins", sans-serif; }
-.game-container { display:flex; align-items:center; justify-content:center; min-height:80vh; gap:40px; padding-top:20px; }
+.game-container1 { display:flex; align-items:center; justify-content:center; min-height:80vh; gap:40px; padding-top:20px; }
 .ai-image img { height:745px; max-width:720px; }
 .question-box { background: rgba(255,255,255,0.06); padding:26px; border-radius:14px; width:560px; backdrop-filter: blur(4px); text-align:left; }
 .answer-box input { width:100%; padding:12px 14px; border-radius:8px; border:none; font-weight:600; color:#222; }

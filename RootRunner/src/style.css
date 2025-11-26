@@ -765,11 +765,10 @@ textarea:focus {
   justify-content: center;
   flex-wrap: wrap;
   gap:25px;
-  margin: -160px;
 }
 
 .game-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: #ffffff0d;
   border-radius: 15px;
   padding: 20px;
   width: 300px;
@@ -1083,67 +1082,7 @@ textarea:focus {
   font-weight: 600;
   border-radius: 20px;
   cursor: pointer;
-}
-.game-page { background-color: #58a7d5; min-height: 100vh; color: white; font-family: "Poppins", sans-serif; }
-.game-container { display:flex; align-items:center; justify-content:center; min-height:80vh; gap:40px; padding-top:20px; }
-.ai-image img { height:745px; max-width:720px; }
-.question-box { background: rgba(255,255,255,0.06); padding:26px; border-radius:14px; width:560px; backdrop-filter: blur(4px); text-align:left; }
-.answer-box input { width:100%; padding:12px 14px; border-radius:8px; border:none; font-weight:600; color:#222; }
-.capital-display { margin-top:12px; background: rgba(0,0,0,0.35); padding:10px; border-radius:8px; }
 
-/* modal overlay (shared) */
-.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.75); display:flex; justify-content:center; align-items:center; z-index:3000; }
-.modal { background: linear-gradient(180deg, #0b0f12 0%, #1b2730 100%); color:#fff; border-radius:16px; padding:22px; width: min(720px, 92%); box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align:left; }
-.modal h2 { margin-top:0; }
-.modal pre.secret-text { background: rgba(255,255,255,0.02); padding:14px; border-radius:8px; color:#bfefff; white-space: pre-wrap; font-family: ui-monospace, Menlo, Monaco, "Roboto Mono", monospace; }
-.modal .small-note { margin-top:10px; color:#bfc7ca; font-size:13px; }
-
-/* congrats modal styling — colors matched to your theme (blue/teal theme) */
-.modal.congrats { text-align:center; background: linear-gradient(180deg, rgba(8,10,12,1) 0%, rgba(28,44,56,1) 100%); }
-.congrats-top { display:flex; gap:18px; align-items:center; justify-content:center; }
-.congrats-icon { font-size:40px; background: rgba(255,255,255,0.06); padding:12px; border-radius:8px; }
-.congrats h2 { color:#ffd36b; margin:10px 0 0; } /* accent color for header */
-.congrats-text { margin:18px 0; color:#e6f7fb; font-size:16px; line-height:1.4; }
-
-/* buttons */
-.congrats-buttons { display:flex; gap:12px; justify-content:center; margin-top:12px; }
-.btn-back {
-  background: transparent;
-  color: white;
-  border: 2px solid rgba(255,255,255,0.25);
-  padding:12px 28px;
-  border-radius:28px;
-  font-weight:700;
-  cursor:pointer;
-  transition: .12s;
-}
-.answer-box input::placeholder,
-textarea::placeholder{
-  color: #fff;
-}
-.btn-back:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.45); }
-
-/* responsive */
-@media (max-width:720px) {
-  .ai-image { display:none; }
-  .question-box { width:92%; }
-}
-.close-icon {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  color: #aaa;
-  font-size: 20px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.close-icon:hover {
-  color: #0ef; /* your neon accent color */
-}
-
-.modal {
-  position: relative; /* ensures the close icon stays positioned inside the modal */
 }
 .leaderboard-select {
   background: #0a0f18;

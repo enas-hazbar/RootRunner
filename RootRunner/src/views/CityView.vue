@@ -504,8 +504,7 @@ function openAdminPortal() {
   router.replace({
     query: {
       ...route.query,
-      CityViewAdmin: true,
-      city: route.query.city || "newyork"
+      CityViewAdmin: true
     }
   });
   tab.value = "admin";
@@ -810,7 +809,7 @@ function openAdminPortal() {
 .success-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(240, 251, 255, 0.55);
+  /* background: rgba(240, 251, 255, 0.55); */
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
