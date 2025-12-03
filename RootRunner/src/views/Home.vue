@@ -5,7 +5,7 @@
   {{ message }}
 </div>
 
-    <!-- ===== HERO ===== -->
+    <!--  HERO -->
     <section class="hero" id="home">
       <div class="hero-content">
         <h1>
@@ -21,7 +21,7 @@
         <img src="/home.png" alt="Cybersecurity Shield" />
       </div>
     </section>
-<!-- ===== LOGIN MODAL ===== -->
+<!--  LOGIN MODAL  -->
 <div v-if="showLogin" class="modal-overlay" @click.self="closeAll">
   <div class="login-modal">
     <img src="/logo.gif" alt="RootRunner Logo" class="login-logo" />
@@ -50,7 +50,7 @@
   </div>
 </div>
 
-<!-- ===== SIGNUP MODAL ===== -->
+<!-- SIGNUP MODAL  -->
 <div v-if="showSignup" class="modal-overlay" @click.self="closeAll">
   <div class="login-modal">
     <img src="/logo.gif" alt="RootRunner Logo" class="login-logo" />
@@ -71,7 +71,7 @@
     </form>
   </div>
 </div>
-    <!-- ===== ABOUT SECTION ===== -->
+    <!--  ABOUT SECTION  -->
     <section class="about" id="about">
       <div class="about-container">
         <div class="about-image">
@@ -90,25 +90,7 @@
         </div>
       </div>
     </section>
-
-    <!-- ===== WHO ARE WE SECTION ===== -->
-    <!-- <section class="who-are-we" id="who">
-      <div class="who-content">
-        <h2>Who am I</h2>
-        <p>
-     RootRunner was built by one person with a passion for hacking, problem-solving, and teaching others how to think like a cybersecurity expert.
-        </p>
- 
-        <div class="team-members">
-          <div class="member" v-for="(member, i) in team" :key="i">
-            <img :src="member.image" alt="Team member" />
-            <h3>{{ member.name }}</h3>
-            <p>{{ member.role }}</p>
-          </div>
-        </div>
-      </div>
-    </section> -->
-    <!-- ===== RULES / INSTRUCTION ===== -->
+    <!--  RULES / INSTRUCTION -->
     <section class="rules" id="rules">
       <div class="rules-container">
         <div class="rules-image">
@@ -134,7 +116,7 @@ Remember, use your hints wisely. Every decision brings you closer to uncovering 
         </div>
       </div>
     </section>
-    <!-- ===== CONTACT FORM ===== -->
+    <!--  CONTACT FORM  -->
 <section class="contact" id="contact">
   <div class="contact-container">
     <h2>Contact Form</h2>
@@ -184,7 +166,6 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 
 
-// Browser-native hashing
 async function hashPassword(password) {
   const msgUint8 = new TextEncoder().encode(password)
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)
@@ -192,13 +173,11 @@ async function hashPassword(password) {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-// TEAM
 const team = [
   { name: 'Enas', role: 'Student ', image: '/avater.png' },
 
 ]
 
-// STATES
 const showLogin = ref(false)
 const showSignup = ref(false)
 const loginUsername = ref('')
@@ -207,7 +186,7 @@ const signupUsername = ref('')
 const signupPassword = ref('')
 const confirmPassword = ref('')
 const message = ref('')
-const messageType = ref('') // "success" or "error"
+const messageType = ref('') 
 const name = ref('')
 const email = ref('')
 const messageC = ref('')
@@ -215,12 +194,9 @@ const statusMessage = ref('')
 const router = useRouter()
 
 const isLoggedIn = ref(!!localStorage.getItem('loggedInUser'))
-// 🔐 Validation Errors (Signup)
 const signupError = ref("");
 const passwordStrengthError = ref("");
 const passwordMatchError = ref("");
-
-// 🔐 Validation Errors (Login)
 const loginErrorUser = ref("");
 const loginErrorPass = ref("");
 const loginErrorBoth = ref("");
@@ -230,7 +206,6 @@ function showMessage(text, type = 'success') {
   message.value = text
   messageType.value = type
 
-  // Hide message automatically after 3 seconds
   setTimeout(() => {
     message.value = ''
     messageType.value = ''
@@ -252,8 +227,6 @@ function validatePasswordStrength(password) {
   return true;
 }
 
-
-// FUNCTIONS
 function closeAll() {
   showLogin.value = false
   showSignup.value = false
@@ -282,7 +255,6 @@ function handleGetStarted() {
   }
 }
 
-// SIGNUP
 async function handleSignup() {
   signupError.value = "";
   passwordStrengthError.value = "";
@@ -293,10 +265,8 @@ async function handleSignup() {
     return;
   }
 
-  // Password strength
   if (!validatePasswordStrength(signupPassword.value)) return;
 
-  // Password match
   if (signupPassword.value !== confirmPassword.value) {
     passwordMatchError.value = "Passwords don't match.";
     return;
@@ -319,7 +289,6 @@ async function handleSignup() {
     createdAt: new Date(),
   });
 
-  // AUTO-LOGIN + redirect to dashboard
   localStorage.setItem("loggedInUser", cleanUsername);
 
   showSignup.value = false;
@@ -335,10 +304,10 @@ async function sendEmail() {
     }
 
     await emailjs.send(
-      'service_nlym9r8',     // 🔹 Replace with your Service ID
-      'template_0g09xw8',    // 🔹 Replace with your Template ID
+      'service_nlym9r8',     
+      'template_0g09xw8',   
       params,
-      'DAqq5Ou9VMEWEwZWE'      // 🔹 Replace with your Public Key
+      'DAqq5Ou9VMEWEwZWE'    
     )
 
     statusMessage.value = '✅ Message sent successfully!'
@@ -350,11 +319,9 @@ async function sendEmail() {
     statusMessage.value = '❌ Failed to send message. Please try again later.'
   }
 
-  // Clear status message after a few seconds
   setTimeout(() => (statusMessage.value = ''), 4000)
 }
 
-// LOGIN
 async function handleLogin() {
   loginErrorUser.value = "";
   loginErrorPass.value = "";
@@ -377,19 +344,16 @@ async function handleLogin() {
     return;
   }
 
-  // Successful login
   localStorage.setItem("loggedInUser", cleanUsername);
   showLogin.value = false;
   router.push("/dashboard");
 }
 onMounted(() => {
-  // When Navbar "Login" button is clicked
   window.addEventListener("open-login-modal", () => {
     showLogin.value = true
   })
 })
 
-// Emit event to Navbar when user logs in
 function handleSuccessfulLogin(username) {
   localStorage.setItem("loggedInUser", username)
   const event = new CustomEvent("user-logged-in", { detail: { username } })
@@ -402,10 +366,7 @@ async function handleGoogleLogin() {
 
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-
     const cleanUsername = user.email.split("@")[0].toLowerCase();
-
-    // Save user in Firestore if not exists
     const userRef = doc(db, "users", cleanUsername);
     const snap = await getDoc(userRef);
 
@@ -417,8 +378,6 @@ async function handleGoogleLogin() {
         createdAt: new Date(),
       });
     }
-
-    // Save login session
     localStorage.setItem("loggedInUser", cleanUsername);
 
     showLogin.value = false;

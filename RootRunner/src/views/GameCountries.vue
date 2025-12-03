@@ -15,8 +15,6 @@
         <h3>Countries — Ask the AI</h3>
         <p>
           Meet our AI, trained to recognize every capital city in the world
-          <!-- The real challenge is hidden: find the file <code>text.txt</code> by
-          manipulating the URL — the second hint points you toward that. -->
         </p>
 
         <div class="answer-box">
@@ -43,23 +41,11 @@
         <p>
           Try to change something in the URL
         </p>
-        <!-- <button @click="showHint = false" class="close">Close</button> -->
       </div>
     </div>
 
-    <!-- Description / second hint popup -->
-    <!-- <div v-if="showDescription" class="modal-overlay" @click.self="showDescription = false">
-      <div class="modal">
-        <i class="fa-solid fa-xmark close-icon" @click="showDescription = false"></i>
-        <h2>Hint 2 (URL hack)</h2>
-        <p>
-          The hidden file can be revealed by editing the browser URL. Try adding a path that ends with
-          <code>text.txt</code> (for example: add <code>/../text.txt</code> or <code>/text.txt</code> to the end of the URL).
-        </p>
-      </div>
-    </div> -->
 
-    <!-- Secret file reveal modal (shown when URL indicates secret) -->
+    <!-- Secret file reveal modal  -->
     <div v-if="showSecret" class="modal-overlay">
       <div class="modal">
         <h2>text.txt — Found!</h2>
@@ -67,7 +53,7 @@
         <p class="small-note">This will close automatically after 5 seconds.</p>
       </div>
     </div>
-<!-- Challenge Popup (Book Icon) -->
+<!-- Challenge Popup -->
 <div v-if="showChallenge" class="modal-overlay" @click.self="showChallenge = false">
   <div class="modal">
         <i class="fa-solid fa-xmark close-icon" @click="showChallenge = false"></i>
@@ -78,11 +64,10 @@
       Your task lies in finding a hidden file called <strong>text.txt</strong>.
     </p>
     <br />
-    <!-- <button @click="showChallenge = false">Close</button> -->
   </div>
 </div>
 
-    <!-- Congratulation modal (opens after secret modal auto-closes) -->
+    <!-- Congratulation modal -->
     <div v-if="showCongrats" class="modal-overlay" @click.self="closeCongrats">
       <div class="modal congrats">
         <div class="congrats-top">
@@ -127,8 +112,6 @@ const router = useRouter()
 const route = useRoute()
 const gameStartTime = ref(null)
 const completionTime = ref(null)
-
-/* ---- UI state ---- */
 const country = ref('')
 const capital = ref('')
 const showHint = ref(false)
@@ -136,22 +119,12 @@ const showDescription = ref(false)
 const showSecret = ref(false)
 const showCongrats = ref(false)
 const showChallenge = ref(false)
-//const gameStartTime = ref(null)
-// const completionTime = ref(null)
-
-
-
-
-// secret content (editable)
 const secretContent = ref(
 `FLAG{well_done_you_found_text_dot_txt}
 This is the hidden file content. Good job figuring out the URL trick!`
 )
-
-// current logged user (stored in localStorage on login)
 const username = ref(localStorage.getItem('loggedInUser') || null)
 
-/* ---- Country → capital (REST Countries API) ---- */
 async function getCapital() {
   const name = country.value.trim()
   if (!name) return
@@ -175,11 +148,6 @@ async function getCapital() {
   country.value = ''
 }
 
-/* ---- Secret detection (URL) ----
-   When a route / URL contains text.txt (or ../text.txt), reveal secret modal.
-   When the secret is shown we start a 15s timer: after 15s auto-close secret modal,
-   save completion to Firestore, then open the congratulations modal.
-*/
 let secretTimer = null
 
 function routeHasSecret(path) {
@@ -194,7 +162,6 @@ async function onSecretFound() {
   const user = localStorage.getItem("loggedInUser");
   console.log("🔥 username:", user);
 
-  // TIMER CALCULATION — always at least 1 second
 const now = Date.now();
 const diff = now - gameStartTime.value;
 completionTime.value = Math.round(diff / 1000);
@@ -207,11 +174,9 @@ console.log("🔥 completionTime:", completionTime.value);
 
   if (secretTimer) clearTimeout(secretTimer);
 
-  // DELAY FOR SECRET POPUP
   secretTimer = setTimeout(async () => {
     showSecret.value = false;
 
-    // SAVE PROGRESS
     if (user) {
       try {
         const userRef = doc(db, "users", user);
@@ -229,20 +194,15 @@ console.log("🔥 completionTime:", completionTime.value);
       }
     }
 
-    // ⭐⭐⭐ SAVE BEST TIME ONLY ⭐⭐⭐
 
     try {
-      // create a unique doc ID for this user's Countries game
       const scoreId = `${user}_Countries`;
       const scoreRef = doc(db, "leaderboard", scoreId);
-
-      // check existing best time (if any)
       const existing = await getDoc(scoreRef);
       const oldTime = existing.exists() ? existing.data().time : null;
 
       console.log("🔥 Old best:", oldTime, "| New time:", completionTime.value);
 
-      // save only if first time or faster
       if (oldTime === null || completionTime.value < oldTime) {
         await setDoc(
           scoreRef,
@@ -263,7 +223,6 @@ console.log("🔥 completionTime:", completionTime.value);
       console.error("🔥 leaderboard save error:", err);
     }
 
-    // After saving progress + leaderboard:
     localStorage.removeItem("atlas_start_time");
     showCongrats.value = true;
 
@@ -271,7 +230,6 @@ console.log("🔥 completionTime:", completionTime.value);
 
 }
 
-/* stop timer if user navigates away */
 function cancelSecretTimer() {
   if (secretTimer) {
     clearTimeout(secretTimer)
@@ -279,30 +237,23 @@ function cancelSecretTimer() {
   }
 }
 
-/* watch route changes and window popstate */
 function checkCurrentLocation() {
   const pathToCheck = route.fullPath || window.location.pathname || window.location.href
   if (routeHasSecret(pathToCheck)) {
-    // new secret found
     onSecretFound()
   } else {
-    // close/hide if present
     showSecret.value = false
-    // do NOT automatically close congrats here (congrats remains until user clicks Back)
     cancelSecretTimer()
   }
 }
 
 onMounted(() => {
-  // Check if timer already running
   const savedStart = localStorage.getItem("atlas_start_time");
 
   if (savedStart) {
-    // Continue the old timer
     gameStartTime.value = parseInt(savedStart);
     console.log("⏳ Timer resumed:", gameStartTime.value);
   } else {
-    // Start a new timer
     const now = Date.now();
     localStorage.setItem("atlas_start_time", now);
     gameStartTime.value = now;
@@ -319,44 +270,34 @@ onUnmounted(() => {
   cancelSecretTimer()
 })
 
-/* also watch the vue route fullPath (SPA navigation) */
 watch(() => route.fullPath, () => checkCurrentLocation())
 
-/* Congratulation modal actions */
 function closeCongrats() {
   showCongrats.value = false
 }
 
 function goToDashboard() {
-  // optional: you could also record a timestamp or badge in Firestore
   router.push('/dashboard')
 }
 </script>
 
 <style scoped>
-/* basic structure (keep similar theme to your other popups) */
 .game-page { background-color: #58a7d5; min-height: 100vh; color: white; font-family: "Poppins", sans-serif; }
 .game-container1 { display:flex; align-items:center; justify-content:center; min-height:80vh; gap:40px; padding-top:20px; }
 .ai-image img { height:745px; max-width:720px; }
 .question-box { background: rgba(255,255,255,0.06); padding:26px; border-radius:14px; width:560px; backdrop-filter: blur(4px); text-align:left; }
 .answer-box input { width:100%; padding:12px 14px; border-radius:8px; border:none; font-weight:600; color:#222; }
 .capital-display { margin-top:12px; background: rgba(0,0,0,0.35); padding:10px; border-radius:8px; }
-
-/* modal overlay (shared) */
 .modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.75); display:flex; justify-content:center; align-items:center; z-index:3000; }
 .modal { background: linear-gradient(180deg, #0b0f12 0%, #1b2730 100%); color:#fff; border-radius:16px; padding:22px; width: min(720px, 92%); box-shadow: 0 10px 40px rgba(0,0,0,0.6); text-align:left; }
 .modal h2 { margin-top:0; }
 .modal pre.secret-text { background: rgba(255,255,255,0.02); padding:14px; border-radius:8px; color:#bfefff; white-space: pre-wrap; font-family: ui-monospace, Menlo, Monaco, "Roboto Mono", monospace; }
 .modal .small-note { margin-top:10px; color:#bfc7ca; font-size:13px; }
-
-/* congrats modal styling — colors matched to your theme (blue/teal theme) */
 .modal.congrats { text-align:center; background: linear-gradient(180deg, rgba(8,10,12,1) 0%, rgba(28,44,56,1) 100%); }
 .congrats-top { display:flex; gap:18px; align-items:center; justify-content:center; }
 .congrats-icon { font-size:40px; background: rgba(255,255,255,0.06); padding:12px; border-radius:8px; }
-.congrats h2 { color:#ffd36b; margin:10px 0 0; } /* accent color for header */
+.congrats h2 { color:#ffd36b; margin:10px 0 0; } 
 .congrats-text { margin:18px 0; color:#e6f7fb; font-size:16px; line-height:1.4; }
-
-/* buttons */
 .congrats-buttons { display:flex; gap:12px; justify-content:center; margin-top:12px; }
 .btn-back {
   background: transparent;
@@ -374,7 +315,6 @@ textarea::placeholder{
 }
 .btn-back:hover { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.45); }
 
-/* responsive */
 @media (max-width:720px) {
   .ai-image { display:none; }
   .question-box { width:92%; }
@@ -390,11 +330,11 @@ textarea::placeholder{
 }
 
 .close-icon:hover {
-  color: #0ef; /* your neon accent color */
+  color: #0ef;
 }
 
 .modal {
-  position: relative; /* ensures the close icon stays positioned inside the modal */
+  position: relative;
 }
 
 </style>

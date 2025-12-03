@@ -5,7 +5,6 @@ import router from './router';
 import './style.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
-// Vuetify imports
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'

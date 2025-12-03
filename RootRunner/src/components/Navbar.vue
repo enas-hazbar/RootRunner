@@ -12,7 +12,7 @@
       <a href="#contact" @click.prevent="scrollToSection('contact')" :class="{ active: activeSection === 'contact' }">Contact</a>
     </nav>
 
-    <!-- ✅ USER ICON + MENU -->
+    <!-- USER ICON + MENU -->
     <div class="user-icon" @click="toggleUserMenu">
       <i class="fa-solid fa-circle-user"></i>
 
@@ -29,7 +29,7 @@
     </div>
   </header>
 
-  <!-- ✅ MESSAGE BANNER -->
+  <!-- MESSAGE BANNER -->
   <div v-if="message" :class="['message-banner', messageType]">
     {{ message }}
   </div>
@@ -85,14 +85,11 @@ function handleScroll() {
   }
 }
 
-// ✅ Opens login modal (trigger handled in Home.vue)
 function openLogin() {
   const event = new CustomEvent("open-login-modal");
   window.dispatchEvent(event);
   showMenu.value = false;
 }
-
-// ✅ Logout
 function logout() {
   localStorage.removeItem("loggedInUser");
   loggedInUser.value = null;
@@ -101,7 +98,6 @@ function logout() {
   showMessage('✅ Logged out successfully!');
 }
 
-// ✅ Go to Dashboard
 function goToDashboard() {
   showMenu.value = false;
   router.push('/dashboard');
@@ -109,7 +105,6 @@ function goToDashboard() {
 
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
-  // When a login event is fired
   window.addEventListener("user-logged-in", (e) => {
     loggedInUser.value = e.detail.username;
   });

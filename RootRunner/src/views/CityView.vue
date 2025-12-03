@@ -261,12 +261,10 @@ import { getStorage } from "firebase/storage";
 
 const tab = ref("welcome");
 
-// ------------------ TIMER ------------------
 const startTime = ref(null);
 const elapsedTime = ref(0);
 let timerInterval = null;
 
-// Start timer ONCE when user opens the game
 onMounted(async () => {
   if (!localStorage.getItem("CityViewTimerStart")) {
     const now = Date.now();
@@ -276,7 +274,6 @@ onMounted(async () => {
     startTime.value = Number(localStorage.getItem("CityViewTimerStart"));
   }
 
-  // Start interval
   timerInterval = setInterval(() => {
     elapsedTime.value = Math.floor((Date.now() - startTime.value) / 1000);
   }, 1000);
@@ -289,7 +286,6 @@ onUnmounted(() => {
   clearInterval(timerInterval);
 });
 
-// ------------------ PAGE LOGIC ------------------
 const showHints = ref(false);
 const showChallenge = ref(false);
 
@@ -357,7 +353,6 @@ const hiddenEmployee = {
 
 const selected = ref(null);
 
-// ------------------ WATCHERS ------------------
 watch(() => route.query.employee, (val) => {
   if (Number(val) === 8 && !usedHint1.value) {
     usedHint1.value = true;
@@ -378,7 +373,6 @@ watch(() => route.query.city, (city) => {
   }
 }, { immediate: true });
 
-// ------------------ ACTIONS ------------------
 function switchTab(t) {
   tab.value = t;
   selected.value = null;
@@ -422,7 +416,6 @@ function loginAdmin() {
   }
 }
 
-// ------------------ UPLOAD IMAGE + FINISH ------------------
 async function finishChallenge(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -448,7 +441,6 @@ async function finishChallenge(event) {
 
       await loadAllUploads();
 
-      // ------------------ STOP TIMER ------------------
       clearInterval(timerInterval);
       const totalSeconds = elapsedTime.value;
 
@@ -475,7 +467,6 @@ async function finishChallenge(event) {
   reader.readAsDataURL(file);
 }
 
-// ------------------ LOAD UPLOADED IMAGES ------------------
 async function loadAllUploads() {
   allUploads.value = [];
   const snapshot = await getDocs(collection(db, "CityViewUploads"));
@@ -492,7 +483,6 @@ function goBack() {
   window.location.href = "/Dashboard";
 }
 
-// Handle hidden employee
 function handleHiddenEmployee() {
   const employeeId = Number(route.query.employee);
   if (employeeId === 8) {
@@ -519,7 +509,6 @@ function openAdminPortal() {
   font-family: "Poppins", sans-serif;
 }
 
-/* Background */
 .bg {
   position: absolute;
   inset: 0;
@@ -545,7 +534,6 @@ function openAdminPortal() {
   color: white;
 }
 
-/* Header */
 .top-section {
   display: flex;
   justify-content: space-between;
@@ -576,7 +564,6 @@ function openAdminPortal() {
   border-bottom: 2px solid white;
 }
 
-/* Content box */
 .content {
   margin-top: 35px;
   background: white;
@@ -586,7 +573,6 @@ function openAdminPortal() {
   min-height: 300px;
 }
 
-/* Employees */
 .employee-grid {
   display: flex;
   justify-content: center;
@@ -619,13 +605,11 @@ function openAdminPortal() {
   color: #008cff;
 }
 
-/* Contact */
 .contact-list {
   margin-top: 10px;
   line-height: 1.6;
 }
 
-/* Hints styling (same vibe as other games) */
 .hint-list {
   list-style: none;
   padding: 0;
@@ -645,7 +629,6 @@ function openAdminPortal() {
   font-size: 14px;
 }
 
-/* Modal shared styles */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -730,7 +713,6 @@ function openAdminPortal() {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-/* Admin title */
 .admin-box h2 {
   font-size: 30px;
   color: #222;
@@ -738,7 +720,6 @@ function openAdminPortal() {
   margin-bottom: 15px;
 }
 
-/* Admin intro text */
 .admin-box p {
   font-size: 16px;
   color: #444;
@@ -746,7 +727,6 @@ function openAdminPortal() {
   margin-bottom: 25px;
 }
 
-/* Input wrapper */
 .login-form-admin {
   display: flex;
   flex-direction: column;
@@ -754,14 +734,12 @@ function openAdminPortal() {
   max-width: 350px;
 }
 
-/* Labels */
 .login-form-admin label {
   font-size: 15px;
   font-weight: 600;
   color: #333;
 }
 
-/* Inputs */
 .login-form-admin input {
   padding: 10px 12px;
   border: 1px solid #ccc;
@@ -777,7 +755,6 @@ function openAdminPortal() {
   box-shadow: 0 0 6px rgba(0, 140, 255, 0.25);
 }
 
-/* Login button */
 .login-form-admin button {
   margin-top: 12px;
   padding: 10px 14px;
@@ -805,11 +782,9 @@ function openAdminPortal() {
   color: #222;
   font-weight: 600;
 }
-/* --- Success Popup Overlay --- */
 .success-overlay {
   position: fixed;
   inset: 0;
-  /* background: rgba(240, 251, 255, 0.55); */
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -818,7 +793,6 @@ function openAdminPortal() {
   animation: fadeIn 0.35s ease-out;
 }
 
-/* --- Card --- */
 .success-box {
   background: #8bdeff;
   backdrop-filter: blur(22px);
@@ -831,14 +805,12 @@ function openAdminPortal() {
   border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-/* --- Logo --- */
 .success-logo {
   width: 95px;
   margin-bottom: 22px;
   opacity: 0.95;
 }
 
-/* --- Title --- */
 .success-title {
   font-size: 34px;
   font-weight: 800;
@@ -847,14 +819,12 @@ function openAdminPortal() {
   margin-bottom: 18px;
 }
 
-/* --- Subtitle --- */
 .success-sub {
   font-size: 18px;
   color: #334a62;
   margin-bottom: 32px;
 }
 
-/* --- Button --- */
 .success-btn {
   padding: 14px 34px;
   font-size: 18px;
@@ -871,14 +841,12 @@ function openAdminPortal() {
   background: #2f6ed2;
 }
 
-/* --- Footer text --- */
 .success-hint {
   margin-top: 26px;
   font-size: 15px;
   color: #6d7c8f;
 }
 
-/* --- Animations --- */
 @keyframes popupIn {
   0% { transform: translateY(20px) scale(0.97); opacity: 0; }
   100% { transform: translateY(0) scale(1); opacity: 1; }
@@ -888,12 +856,6 @@ function openAdminPortal() {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
-
-/* @keyframes pulseGlow {
-  0%, 100% { filter: drop-shadow(0 0 5px #ffffff); }
-  50% { filter: drop-shadow(0 0 15px #ffffff); }
-} */
 
 .upload-label {
   padding: 10px 18px;
@@ -916,7 +878,6 @@ function openAdminPortal() {
   display: none;
 }
 
-/* Preview image styling */
 .preview-wrapper {
   margin-top: 15px;
 }
@@ -928,7 +889,6 @@ function openAdminPortal() {
   margin-top: 8px;
 }
 
-/* Gallery styling */
 .gallery-grid {
   display: flex;
   flex-wrap: wrap;

@@ -47,7 +47,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Props ONLY used for HackerAcademy
 const props = defineProps({
   usedHint1: {
     type: Boolean,
@@ -66,13 +65,11 @@ function exitGame() {
 }
 
 function handleHintClick() {
-  // If props are null → this is GameCountries → use the old event
   if (props.usedHint1 === null) {
     emit("show-hint")
     return
   }
 
-  // HackerAcademy logic
   if (!props.usedHint1) {
     emit("show-hint1")
   } else if (!props.usedHint2) {

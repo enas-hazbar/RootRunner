@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <!-- ===== GAME POPUP MODAL ===== -->
+    <!-- GAME POPUP MODAL -->
     <div v-if="showGamePopup" class="modal-overlay" @click.self="closeGamePopup">
       <div class="game-modal">
         <h2>{{ selectedGame?.title }}</h2>
@@ -87,7 +87,6 @@ import { doc, getDoc,collection,
 const router = useRouter()
 const username = ref(localStorage.getItem('loggedInUser'))
 
-// Games list
 const games = ref([
   {
     title: 'The Atlas Protocol',
@@ -158,10 +157,7 @@ async function loadProgress() {
   if (snap.exists()) {
     const data = snap.data()
 
-    // Check if there's progress for Countries
     const countryProgress = data.progress?.Countries || 0
-
-    // Update the Countries game inside the array
     const game = games.value.find(g => g.title === 'The Atlas Protocol')
     if (game) game.progress = countryProgress
     const hackerProgress = data.progress?.HackerAcademy || 0
